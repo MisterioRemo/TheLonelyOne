@@ -172,6 +172,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkingSpeed: 10
   runnigSpeed: 0
-  acceleration: 0
-  decceleration: 0
-  velocityPower: 0
+  acceleration: 10
+  decceleration: 13
+  velocityPower: 0.9
+  friction: 2

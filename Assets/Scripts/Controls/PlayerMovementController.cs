@@ -18,30 +18,16 @@ namespace TheLonelyOne.Player
     #region STATE PARAMETERS
     public bool IsWalking { get; private set; }
     public bool IsRunnnig { get; private set; }
+    public float CurrentVelocity { get => rigidbody2d.velocity.x; }
+    public int Direction { get; private set; }
 
-    [SerializeField]
-    private float walkingSpeed;
-    public  float WalkingSpeed
-    {
-      get => walkingSpeed;
-      private set => walkingSpeed = value;
-    }
-
-    [SerializeField]
-    private float runnigSpeed;
-    public  float RunningSpeed
-    {
-      get => runnigSpeed;
-      private set => runnigSpeed = value;
-    }
-
+    [SerializeField] private float walkingSpeed;
+    [SerializeField] private float runnigSpeed;
     [SerializeField] private float acceleration;
     [SerializeField] private float decceleration;
     [SerializeField] private float velocityPower;
     [SerializeField] private float friction;
     #endregion
-
-    private float walkingTime;
 
     private void Awake()
     {
@@ -49,28 +35,23 @@ namespace TheLonelyOne.Player
       inputActions = new PlayerInputActions();
 
       inputActions.Player.Enable();
-      inputActions.Player.Movement.started += StartMovement;
-    }
+      inputActions.Player.Movement.started  += (_context) => IsWalking = true;
+      inputActions.Player.Movement.canceled += (_context) => IsWalking = false;
+      }
 
     private void FixedUpdate()
     {
       if (IsWalking)
         Move(1.0f);
-    }
 
-    private void StartMovement(InputAction.CallbackContext _context)
-    {
-      IsWalking   = true;
-      walkingTime = 0.0f;
+      if (!IsWalking && Mathf.Abs(rigidbody2d.velocity.x) > 0.01f)
+        Drag(friction);
     }
 
     private void Move(float _lerpValue)
     {
-      if (walkingTime > float.Epsilon && Mathf.Abs(rigidbody2d.velocity.x) < float.Epsilon)
-        IsWalking = false;
-
       Vector2 inputVetor  = inputActions.Player.Movement.ReadValue<Vector2>();
-      float   targetSpeed = inputVetor.x * WalkingSpeed;
+      float   targetSpeed = inputVetor.x * walkingSpeed;
       float   deltaSpeed  = targetSpeed - rigidbody2d.velocity.x;
       float   accelRate   = (Mathf.Abs(targetSpeed) < float.Epsilon) ? acceleration : decceleration;
       float   movement    = Mathf.Pow(Mathf.Abs(deltaSpeed) * accelRate, velocityPower) * Mathf.Sign(deltaSpeed);
@@ -78,7 +59,15 @@ namespace TheLonelyOne.Player
       movement = Mathf.Lerp(rigidbody2d.velocity.x, movement, _lerpValue);
       rigidbody2d.AddForce(movement * Vector2.right);
 
-      walkingTime += Time.fixedDeltaTime;
+      Direction = (int)Mathf.Sign(rigidbody2d.velocity.x);
+    }
+
+    private void Drag(float _amount)
+    {
+      float force = Mathf.Abs(rigidbody2d.velocity.x) * _amount;
+      force *= -Mathf.Sign(rigidbody2d.velocity.x);
+
+      rigidbody2d.AddForce(force * Vector2.right, ForceMode2D.Impulse);
     }
   }
 }
