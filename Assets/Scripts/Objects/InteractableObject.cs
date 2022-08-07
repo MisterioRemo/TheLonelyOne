@@ -6,34 +6,34 @@ namespace TheLonelyOne
   public class InteractableObject : MonoBehaviour, IInteractable
   {
     #region COMPOMEMTS
-    private GameObject icon;
+    protected GameObject icon;
     #endregion
 
     #region IInteractable
-    public void Interact()
+    public virtual void Interact()
     {
       // Empty
     }
     #endregion
 
-    private void Awake()
+    protected virtual void Awake()
     {
       icon = transform.Find("Icon").gameObject;
+
+      enabled = false;
     }
 
-    private void Update()
+    protected void OnTriggerEnter2D(Collider2D _collision)
     {
-
+      if (icon)
+        icon.SetActive(true);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected void OnTriggerExit2D(Collider2D _collision)
     {
-      icon.SetActive(true);
+      if (icon)
+        icon.SetActive(false);
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-      icon.SetActive(false);
-    }
   }
 }
