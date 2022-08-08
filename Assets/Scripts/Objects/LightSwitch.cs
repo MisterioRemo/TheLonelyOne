@@ -53,7 +53,6 @@ namespace TheLonelyOne
       base.Awake();
 
       states         = new Dictionary<SwitchState, Sprite>();
-      switchStates   = new List<SwitchStatePair>();
       spriteRenderer = GetComponent<SpriteRenderer>();
 
       foreach (var pair in switchStates)
