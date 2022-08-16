@@ -10,7 +10,7 @@ namespace TheLonelyOne.Player
   [RequireComponent(typeof(Rigidbody2D))]
   public class PlayerMovementController : MonoBehaviour
   {
-    #region COMPOMEMTS
+    #region COMPONENTS
     private Rigidbody2D rigidbody2d;
     #endregion
 
@@ -43,6 +43,9 @@ namespace TheLonelyOne.Player
 
     private void FixedUpdate()
     {
+      if (Dialogue.DialogueManager.Instance.IsDialoguePlaying)
+        return;
+
       IsMoving = false;
 
       if (IsWalking)
