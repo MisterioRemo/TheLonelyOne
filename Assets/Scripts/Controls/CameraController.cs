@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace TheLonelyOne.Camera
+namespace TheLonelyOne
 {
   public class CameraController : MonoBehaviour
   {
-    #region COMPOMEMTS
+    #region COMPONENTS
     [SerializeField] private Rigidbody2D target;
     #endregion
 
