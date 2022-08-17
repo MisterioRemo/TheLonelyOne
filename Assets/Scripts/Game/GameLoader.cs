@@ -6,6 +6,7 @@ namespace TheLonelyOne
   {
     #region CONTROLLERS
     public GameObject EventsManager;
+    public GameObject DialogueManager;
     #endregion
 
     private void Awake()
@@ -14,6 +15,9 @@ namespace TheLonelyOne
 
       if (GameEvents.Instance == null)
         Instantiate(EventsManager);
+
+      if (Dialogue.DialogueManager.Instance == null)
+        Instantiate(DialogueManager);
     }
   }
 }

@@ -5,7 +5,7 @@ namespace TheLonelyOne.Player
 {
   public class PlayerController : MonoBehaviour, ICharacter
   {
-    #region COMPOMEMTS
+    #region COMPONENTS
     private PlayerInputActions       inputActions;
     private PlayerMovementController movementCtrl;
     private Animator                 animator;
@@ -17,12 +17,11 @@ namespace TheLonelyOne.Player
     {
       movementCtrl = GetComponent<PlayerMovementController>();
       animator     = GetComponent<Animator>();
-
-      SetUpPlayerInputAction();
     }
 
     private void Start()
     {
+      SetUpPlayerInputAction();
       GameEvents.Instance.OnPlayerMoving += SetUpAnimation;
     }
 
@@ -34,6 +33,15 @@ namespace TheLonelyOne.Player
 
     private void OnDestroy()
     {
+      // Movement
+      inputActions.Player.Movement.started  -= movementCtrl.PlayerMovementStarted;
+      inputActions.Player.Movement.canceled -= movementCtrl.PlayerMovementCanceled;
+
+      // Interaction
+      inputActions.Player.Interact.performed -= InteractionPressed;
+      inputActions.Player.Movement.performed -= Dialogue.DialogueManager.Instance.ShowNextDialogueChoice;
+
+      // Animation
       GameEvents.Instance.OnPlayerMoving -= SetUpAnimation;
     }
 
@@ -49,6 +57,7 @@ namespace TheLonelyOne.Player
 
       // Interaction
       inputActions.Player.Interact.performed += InteractionPressed;
+      inputActions.Player.Movement.performed += Dialogue.DialogueManager.Instance.ShowNextDialogueChoice;
     }
 
     private void SetUpAnimation()
@@ -66,7 +75,7 @@ namespace TheLonelyOne.Player
 
     private void OnTriggerEnter2D(Collider2D _collision)
     {
-      if (_collision.gameObject.GetComponent<IInteractable>() is IInteractable interactable)
+      if (_collision.gameObject.GetComponentInChildren<IInteractable>() is IInteractable interactable)
         interactableObject = interactable;
     }
 
