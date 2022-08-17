@@ -20,7 +20,7 @@ namespace TheLonelyOne
       public Sprite      sprite;
     }
 
-    #region COMPOMEMTS
+    #region COMPONENTS
     private SpriteRenderer                  spriteRenderer;
     private Dictionary<SwitchState, Sprite> states;
 

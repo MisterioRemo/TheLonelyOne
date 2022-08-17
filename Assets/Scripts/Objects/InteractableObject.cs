@@ -1,12 +1,11 @@
 using UnityEngine;
-using TheLonelyOne.GUI.Icon;
 
 namespace TheLonelyOne
 {
   public class InteractableObject : MonoBehaviour, IInteractable
   {
-    #region COMPOMEMTS
-    protected GameObject icon;
+    #region COMPONENTS
+    [SerializeField] protected GameObject icon;
     #endregion
 
     #region IInteractable
@@ -18,20 +17,18 @@ namespace TheLonelyOne
 
     protected virtual void Awake()
     {
-      icon = transform.Find("Icon").gameObject;
-
       enabled = false;
     }
 
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
-      if (icon)
+      if (icon && _collision.gameObject.tag == "Player")
         icon.SetActive(true);
     }
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
-      if (icon)
+      if (icon && _collision.gameObject.tag == "Player")
         icon.SetActive(false);
     }
 
