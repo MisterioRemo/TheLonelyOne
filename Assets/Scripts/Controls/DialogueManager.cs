@@ -2,11 +2,10 @@ using UnityEngine;
 using Ink.Runtime;
 using System.Collections.Generic;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
-using System.Linq;
 
 namespace TheLonelyOne.Dialogue
 {
-  public class DialogueManager : MonoBehaviour
+  public partial class DialogueManager : MonoBehaviour
   {
     public static DialogueManager Instance { get; private set; }
 
@@ -82,7 +81,7 @@ namespace TheLonelyOne.Dialogue
       inkStory          = new Story(_inkAsset.text);
       IsDialoguePlaying = true;
 
-      ParseTags(inkStory.globalTags);
+      Parser.ParseTags(inkStory.globalTags);
       ContinueDialogue();
     }
 
@@ -97,7 +96,18 @@ namespace TheLonelyOne.Dialogue
       if (inkStory.canContinue)
       {
         inkStory.Continue();
-        ParseTags(inkStory.currentTags);
+        Parser.ParseTags(inkStory.currentTags);
+
+        if (Parser.ParseFunction(inkStory.currentText,
+                                 out GameObject participant,
+                                 out string functionName,
+                                 out string[] functionParams))
+        {
+          DialogueAction.Invoke(participant, functionName, functionParams);
+          ContinueDialogue();
+          return;
+        }
+
         DrawSpeechBubble(participants[currentParticipantName], inkStory.currentText);
         return;
       }
@@ -141,7 +151,7 @@ namespace TheLonelyOne.Dialogue
       CurrentChoiceIndex    = _choiceIndex;
       isChoiceIndexSelected = true;
 
-      ParseTags(GetCustomTags(inkStory.currentChoices[CurrentChoiceIndex].text));
+      Parser.ParseTags(Parser.GetCustomTags(inkStory.currentChoices[CurrentChoiceIndex].text));
       DrawSpeechBubble(participants[currentParticipantName], inkStory.currentChoices[CurrentChoiceIndex].text, true);
     }
 
@@ -152,55 +162,6 @@ namespace TheLonelyOne.Dialogue
 
       inkStory.ChooseChoiceIndex(_index);
       inkStory.Continue();
-    }
-    #endregion
-
-    #region PARSE TAGS
-    private List<string> GetCustomTags(string _text)
-    {
-      return _text
-              .Split(' ')
-              .Where(x => x.StartsWith('$'))
-              .Select(x => x.Substring(1))
-              .ToList();
-    }
-
-    private void ParseTags(List<string> _tags)
-    {
-      if (_tags == null)
-        return;
-
-      foreach (var tag in _tags)
-      {
-        string[] values = tag.ToLower().Split(":");
-
-        if (values.Length == 1)
-          ParseSingleTag(values[0]);
-        else
-          ParseParameterizedTag(values);
-      }
-    }
-
-    private void ParseSingleTag(string _tag)
-    {
-      switch (_tag)
-      {
-        default:
-          return;
-      }
-    }
-
-    private void ParseParameterizedTag(string[] _tags)
-    {
-      switch (_tags[0])
-      {
-        case "speaker":
-          currentParticipantName = _tags[1];
-          return;
-
-        default:
-          return;
-      }
     }
     #endregion
   }
