@@ -32,23 +32,19 @@ namespace TheLonelyOne.Dialogue
         return true;
       }
 
-      private static GameObject ParseFuctionTarget(string _targetData)
+      private static GameObject ParseFuctionTarget(string _targetName)
       {
-        string[] properties = _targetData.Split('.');
-        GameObject target   = Instance.participants[properties[0].ToLower()].transform.root.gameObject;
+        string[] hierarchy     = _targetName.Split('/', 2);
+        string participantName = hierarchy[0].ToLower();
 
-        if (properties.Length == 1)
-          return target;
+        if (Instance.participants.ContainsKey(participantName))
+        {
+          return hierarchy.Length > 1
+                 ? Instance.participants[participantName].transform.root.Find(hierarchy[1]).gameObject
+                 : Instance.participants[participantName].transform.root.gameObject;
+        }
 
-        int index = properties[1].IndexOf('[');
-
-        if (index == -1)
-          return target.GetComponent(properties[1]).gameObject;
-
-        string componentName = properties[1].Substring(0, index);
-        string childName     = properties[1].Substring(index + 1, properties[1].Length - index - 2);
-
-        return target.transform.Find(childName).GetComponent(componentName).gameObject;
+        return GameObject.Find(_targetName);
       }
       #endregion
 
