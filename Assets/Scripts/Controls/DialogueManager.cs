@@ -2,6 +2,7 @@ using UnityEngine;
 using Ink.Runtime;
 using System.Collections.Generic;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
+using System;
 
 namespace TheLonelyOne.Dialogue
 {
@@ -15,6 +16,8 @@ namespace TheLonelyOne.Dialogue
     private int                                     currentChoiceIndex;
     private bool                                    isChoiceIndexSelected;
     private Dictionary<string, DialogueParticipant> participants;
+
+    private Action<string>                          updateInkStateCallback;
     #endregion
 
     #region PROPERTIES
@@ -30,8 +33,6 @@ namespace TheLonelyOne.Dialogue
 
     private void Awake()
     {
-      enabled = false;
-
       if (Instance != null && Instance != this)
       {
         Destroy(this);
@@ -54,6 +55,7 @@ namespace TheLonelyOne.Dialogue
       isChoiceIndexSelected  = false;
       IsDialoguePlaying      = false;
       inkStory               = null;
+      updateInkStateCallback = null;
     }
 
     #region PARTICIPANT MODIFICATION METHODS
@@ -76,11 +78,13 @@ namespace TheLonelyOne.Dialogue
     #endregion
 
     #region DIALOGUE CONTROL
-    public void StartDialogue(TextAsset _inkAsset)
+    public void StartDialogue(TextAsset _inkAsset, string _inkState, Action<string> _updateInkStateCallback)
     {
-      inkStory          = new Story(_inkAsset.text);
-      IsDialoguePlaying = true;
+      inkStory               = new Story(_inkAsset.text);
+      IsDialoguePlaying      = true;
+      updateInkStateCallback = _updateInkStateCallback;
 
+      SetStoryState(inkStory, _inkState);
       Parser.ParseTags(inkStory.globalTags);
       ContinueDialogue();
     }
@@ -130,7 +134,17 @@ namespace TheLonelyOne.Dialogue
 
     public void EndDialogue()
     {
+      updateInkStateCallback(inkStory.state.ToJson());
       ResetParameters();
+    }
+
+    private void SetStoryState(Story _inkStory, string _inkState)
+    {
+      if (!string.IsNullOrEmpty(_inkState))
+        _inkStory.state.LoadJson(_inkState);
+
+      _inkStory.ChoosePathString("EntryPoint");
+      _inkStory.Continue();
     }
 
     private void DrawSpeechBubble(DialogueParticipant _dialogueParticipant, string _text, bool _hasChoice = false)
