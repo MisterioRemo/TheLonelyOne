@@ -5,15 +5,19 @@ using TMPro;
 
 namespace TheLonelyOne
 {
-  public class DialogueParticipant : MonoBehaviour, IInteractable
+  public class DialogueParticipant : MonoBehaviour, IInteractable, IDataPersistence
   {
     #region PARAMETERS
+    [SerializeField] protected string id;
+
     [Header("Participant")]
     [SerializeField] protected string         participantName;
     [SerializeField] protected SpriteRenderer participantSpriteRenderer;
 
     [Header("Ink")]
     [SerializeField] protected TextAsset inkAsset;
+
+    protected string inkState;
 
     [Header("Speech bubble")]
     [SerializeField] protected Vector2 speechBubbleOffset;
@@ -31,13 +35,29 @@ namespace TheLonelyOne
                                    }
     #endregion
 
+    [ContextMenu("Generate guid fo id")]
+    protected void GenerateGuid() => id = System.Guid.NewGuid().ToString();
+
     #region IInteractable
     public virtual void Interact()
     {
       if (!DialogueManager.Instance.IsDialoguePlaying)
-        DialogueManager.Instance.StartDialogue(inkAsset);
+        DialogueManager.Instance.StartDialogue(inkAsset, inkState, UpdateInkState);
       else
         DialogueManager.Instance.ContinueDialogue();
+    }
+    #endregion
+
+    #region IDataPersistence
+    public void Save(ref GameData _gameData)
+    {
+      if (!string.IsNullOrEmpty(inkState))
+        _gameData.DialogueAssetStates[id] = inkState;
+    }
+
+    public void Load(GameData _gameData)
+    {
+      _gameData.DialogueAssetStates.TryGetValue(id, out inkState);
     }
     #endregion
 
@@ -84,6 +104,11 @@ namespace TheLonelyOne
                                                  participantPosition.z);
 
       speechBubble.transform.position = Camera.main.WorldToScreenPoint(speechBubblePosition);
+    }
+
+    public void UpdateInkState(string _savedJson)
+    {
+      inkState = _savedJson;
     }
   }
 }

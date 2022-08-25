@@ -5,7 +5,8 @@ namespace TheLonelyOne
   public class GameLoader : MonoBehaviour
   {
     #region CONTROLLERS
-    public GameObject EventsManager;
+    public GameObject SaveSystem;
+    public GameObject GameEvents;
     public GameObject DialogueManager;
     #endregion
 
@@ -13,11 +14,17 @@ namespace TheLonelyOne
     {
       enabled = false;
 
-      if (GameEvents.Instance == null)
-        Instantiate(EventsManager);
+      if (TheLonelyOne.SaveSystem.Instance == null)
+        Instantiate(SaveSystem);
+
+      if (TheLonelyOne.GameEvents.Instance == null)
+        Instantiate(GameEvents);
 
       if (Dialogue.DialogueManager.Instance == null)
         Instantiate(DialogueManager);
+
+      // TEMP!
+      TheLonelyOne.SaveSystem.Instance.NewGame();
     }
   }
 }
