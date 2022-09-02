@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -27,6 +26,7 @@ namespace TheLonelyOne
       }
 
       Instance = this;
+      gameData = new GameData();
     }
 
     private void Start()

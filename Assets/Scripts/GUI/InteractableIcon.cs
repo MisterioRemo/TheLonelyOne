@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TheLonelyOne.GUI.Icon
+namespace TheLonelyOne.UI.Icon
 {
   [RequireComponent(typeof(Animator))]
   public class InteractableIcon : MonoBehaviour

@@ -6,8 +6,8 @@ namespace TheLonelyOne.SerializableTypes
   [System.Serializable]
   public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
   {
-    private List<TKey>   keys   = new List<TKey>();
-    private List<TValue> values = new List<TValue>();
+    public List<TKey>   keys   = new List<TKey>();
+    public List<TValue> values = new List<TValue>();
 
     public void OnAfterDeserialize()
     {

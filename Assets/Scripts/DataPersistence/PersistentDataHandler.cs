@@ -82,7 +82,7 @@ namespace TheLonelyOne
       StringBuilder builder = new StringBuilder("", _data.Length);
 
       for (int i = 0; i < _data.Length; ++i)
-        builder.Append(_data[i] ^ encryptionCodeWord[i % encryptionCodeWord.Length]);
+        builder.Append((char)(_data[i] ^ encryptionCodeWord[i % encryptionCodeWord.Length]));
 
       return builder.ToString();
     }

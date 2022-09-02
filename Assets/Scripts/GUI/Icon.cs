@@ -1,4 +1,4 @@
-namespace TheLonelyOne.GUI.Icon
+namespace TheLonelyOne.UI.Icon
 {
   public enum InteractableIconType
   {
