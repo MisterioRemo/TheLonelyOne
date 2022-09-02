@@ -1,8 +1,8 @@
 using UnityEngine;
-using Ink.Runtime;
-using System.Collections.Generic;
-using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
 using System;
+using System.Collections.Generic;
+using Ink.Runtime;
+using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 namespace TheLonelyOne.Dialogue
 {
@@ -15,6 +15,7 @@ namespace TheLonelyOne.Dialogue
     private string                                  currentParticipantName;
     private int                                     currentChoiceIndex;
     private bool                                    isChoiceIndexSelected;
+    private bool                                    isChoosingChoie;
     private Dictionary<string, DialogueParticipant> participants;
 
     private Action<string>                          updateInkStateCallback;
@@ -24,9 +25,13 @@ namespace TheLonelyOne.Dialogue
     public bool IsDialoguePlaying { get; private set; }
     private int CurrentChoiceIndex { get => currentChoiceIndex;
                                      set {
-                                       currentChoiceIndex = Mathf.Max(0, value);
+                                       currentChoiceIndex = value;
                                        if (inkStory && inkStory.currentChoices.Count > 0)
-                                         currentChoiceIndex %= inkStory.currentChoices.Count;
+                                       {
+                                         currentChoiceIndex = value < 0
+                                                              ? inkStory.currentChoices.Count - 1
+                                                              : value % inkStory.currentChoices.Count;
+                                       }
                                      }
                                    }
     #endregion
@@ -53,6 +58,7 @@ namespace TheLonelyOne.Dialogue
       currentParticipantName = null;
       CurrentChoiceIndex     = 0;
       isChoiceIndexSelected  = false;
+      isChoosingChoie        = false;
       IsDialoguePlaying      = false;
       inkStory               = null;
       updateInkStateCallback = null;
@@ -103,11 +109,10 @@ namespace TheLonelyOne.Dialogue
         Parser.ParseTags(inkStory.currentTags);
 
         if (Parser.ParseFunction(inkStory.currentText,
-                                 out GameObject participant,
                                  out string functionName,
                                  out string[] functionParams))
         {
-          DialogueAction.Invoke(participant, functionName, functionParams);
+          DialogueAction.Invoke(functionName, functionParams);
           ContinueDialogue();
           return;
         }
@@ -118,6 +123,8 @@ namespace TheLonelyOne.Dialogue
 
       if (inkStory.currentChoices.Count > 0)
       {
+        isChoosingChoie = true;
+
         if (isChoiceIndexSelected)
         {
           ChooseChoiceIndex(CurrentChoiceIndex);
@@ -144,7 +151,6 @@ namespace TheLonelyOne.Dialogue
         _inkStory.state.LoadJson(_inkState);
 
       _inkStory.ChoosePathString("EntryPoint");
-      _inkStory.Continue();
     }
 
     private void DrawSpeechBubble(DialogueParticipant _dialogueParticipant, string _text, bool _hasChoice = false)
@@ -156,7 +162,7 @@ namespace TheLonelyOne.Dialogue
 
     internal void ShowNextDialogueChoice(CallbackContext _context)
     {
-      if (IsDialoguePlaying && inkStory.currentChoices.Count > 0)
+      if (IsDialoguePlaying && isChoosingChoie && inkStory.currentChoices.Count > 0)
         ShowDialogueChoice(CurrentChoiceIndex + (int)_context.ReadValue<Vector2>().x);
     }
 
@@ -173,6 +179,7 @@ namespace TheLonelyOne.Dialogue
     {
       CurrentChoiceIndex    = 0;
       isChoiceIndexSelected = false;
+      isChoosingChoie       = false;
 
       inkStory.ChooseChoiceIndex(_index);
       inkStory.Continue();
