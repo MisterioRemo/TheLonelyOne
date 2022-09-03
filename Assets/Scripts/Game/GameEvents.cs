@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TheLonelyOne
@@ -26,6 +27,15 @@ namespace TheLonelyOne
     public void PlayerMoving()
     {
       OnPlayerMoving?.Invoke();
+    }
+    #endregion
+
+    #region PUZZLES
+    public event Action<string> OnPuzzleCompleted;
+
+    public void CompletePuzzle(string _puzzleId)
+    {
+      OnPuzzleCompleted?.Invoke(_puzzleId);
     }
     #endregion
   }

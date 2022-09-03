@@ -67,7 +67,7 @@ namespace TheLonelyOne
 
     private List<IDataPersistence> FindAllDataPersistenceObjects()
     {
-      return FindObjectsOfType<MonoBehaviour>().OfType<IDataPersistence>().ToList();
+      return FindObjectsOfType<MonoBehaviour>(true).OfType<IDataPersistence>().ToList();
     }
   }
 }

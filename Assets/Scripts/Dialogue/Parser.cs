@@ -6,14 +6,13 @@ namespace TheLonelyOne.Dialogue
 {
   public partial class DialogueManager
   {
-    private static class Parser
+    public static class Parser
     {
       #region FUNCTIONS
-      public static bool ParseFunction(string _text, out GameObject _target, out string _functionName, out string[] _params)
+      internal static bool ParseFunction(string _text, out string _functionName, out string[] _params)
       {
         if (!_text.StartsWith('>'))
         {
-          _target       = null;
           _functionName = null;
           _params       = null;
           return false;
@@ -27,12 +26,11 @@ namespace TheLonelyOne.Dialogue
                                  .ToArray();
 
         _functionName = functionData[0];
-        _target       = functionData.Length > 1 ? ParseFuctionTarget(functionData[1]) : null;
-        _params       = functionData.Length > 2 ? functionData[2..] : null;
+        _params       = functionData[1..];
         return true;
       }
 
-      private static GameObject ParseFuctionTarget(string _targetName)
+      public static GameObject ParseFuctionTarget(string _targetName)
       {
         string[] hierarchy     = _targetName.Split('/', 2);
         string participantName = hierarchy[0].ToLower();

@@ -241,6 +241,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: icon_lock_button
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 24
+        width: 32
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d594c63ae64a5594fb17cde69539da65
+      internalID: -1694920931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: icon_return
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 13
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb2b8a4dfb56afb439da3a7b2d3c775f
+      internalID: -1955160730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -257,6 +299,8 @@ TextureImporter:
       icon_dialogue: -1995972738
       dialogue_arrow: 1534150947
       dialogue_bubble: 991190972
+      icon_lock_button: -1694920931
+      icon_return: -1955160730
       dialogue_tail: 1986909596
   spritePackingTag: 
   pSDRemoveMatte: 0
