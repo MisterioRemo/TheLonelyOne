@@ -5,6 +5,10 @@ namespace TheLonelyOne
   [System.Serializable]
   public class GameData
   {
+    #region OBJECTS
+    public SerializableDictionary<string, ObjectData> Objects;
+    #endregion
+
     #region DIALOGUE
     public SerializableDictionary<string, string> DialogueAssetStates;
     #endregion
@@ -15,6 +19,7 @@ namespace TheLonelyOne
 
     public GameData()
     {
+      Objects             = new SerializableDictionary<string, ObjectData>();
       DialogueAssetStates = new SerializableDictionary<string, string>();
       CombinationLocks    = new SerializableDictionary<string, string>();
     }

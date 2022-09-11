@@ -22,7 +22,7 @@ namespace TheLonelyOne.UI
     #endregion
 
     [ContextMenu("Generate guid fo id")]
-    protected void GenerateGuid() => id = System.Guid.NewGuid().ToString();
+    protected void GenerateGuid() => id = Utils.GenerateGuid();
 
     #region IDataPersistence
     public void Save(ref GameData _gameData)

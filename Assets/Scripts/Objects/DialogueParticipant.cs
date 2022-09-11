@@ -5,7 +5,7 @@ using TMPro;
 
 namespace TheLonelyOne
 {
-  public class DialogueParticipant : MonoBehaviour, IInteractable, IDataPersistence
+  public class DialogueParticipant : MonoBehaviour, IInteractable
   {
     #region PARAMETERS
     [SerializeField] protected string id;
@@ -36,7 +36,7 @@ namespace TheLonelyOne
     #endregion
 
     [ContextMenu("Generate guid fo id")]
-    protected void GenerateGuid() => id = System.Guid.NewGuid().ToString();
+    protected void GenerateGuid() => id = Utils.GenerateGuid();
 
     #region IInteractable
     public virtual void Interact()
@@ -46,9 +46,7 @@ namespace TheLonelyOne
       else
         DialogueManager.Instance.ContinueDialogue();
     }
-    #endregion
 
-    #region IDataPersistence
     public void Save(ref GameData _gameData)
     {
       if (!string.IsNullOrEmpty(inkState))

@@ -1,6 +1,6 @@
 namespace TheLonelyOne
 {
-  public interface IInteractable
+  public interface IInteractable: IDataPersistence
   {
     void Interact();
   }

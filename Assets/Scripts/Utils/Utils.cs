@@ -23,5 +23,14 @@ namespace TheLonelyOne
 
       return new Vector3(values[0], values[1], values[2]);
     }
+
+    /// <summary>
+    /// Генерация уникального id.
+    /// </summary>
+    /// <returns></returns>
+    public static string GenerateGuid()
+    {
+      return System.Guid.NewGuid().ToString();
+    }
   }
 }

@@ -46,18 +46,35 @@ namespace TheLonelyOne
       SwitchSprite(currentState);
       SwitchLights(currentState);
     }
+
+    protected override ObjectStateData SaveObjectState(GameObject _target)
+    {
+      var state  = new LightSwitchStateData();
+      state.IsOn = currentState == SwitchState.On;
+
+      return state;
+    }
+
+    protected override void LoadObjectState(GameObject _target, ObjectStateData _state)
+    {
+      base.LoadObjectState(_target, _state);
+
+      if (_state is LightSwitchStateData lsState)
+        currentState = lsState.IsOn ? SwitchState.On : SwitchState.Off;
+    }
     #endregion
 
-    protected override void Awake()
+    protected void Awake()
     {
-      base.Awake();
-
       states         = new Dictionary<SwitchState, Sprite>();
       spriteRenderer = GetComponent<SpriteRenderer>();
 
       foreach (var pair in switchStates)
         states.Add(pair.state, pair.sprite);
+    }
 
+    protected void Start()
+    {
       SwitchSprite(currentState);
       SwitchLights(currentState);
     }
