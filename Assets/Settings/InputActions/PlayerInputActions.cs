@@ -171,6 +171,12 @@ namespace TheLonelyOne
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UI"",
+            ""id"": ""642c8424-af4c-4136-946c-021160f2ce77"",
+            ""actions"": [],
+            ""bindings"": []
         }
     ],
     ""controlSchemes"": []
@@ -179,6 +185,8 @@ namespace TheLonelyOne
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+            // UI
+            m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -275,10 +283,38 @@ namespace TheLonelyOne
             }
         }
         public PlayerActions @Player => new PlayerActions(this);
+
+        // UI
+        private readonly InputActionMap m_UI;
+        private IUIActions m_UIActionsCallbackInterface;
+        public struct UIActions
+        {
+            private @PlayerInputActions m_Wrapper;
+            public UIActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+            public InputActionMap Get() { return m_Wrapper.m_UI; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
+            public void SetCallbacks(IUIActions instance)
+            {
+                if (m_Wrapper.m_UIActionsCallbackInterface != null)
+                {
+                }
+                m_Wrapper.m_UIActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                }
+            }
+        }
+        public UIActions @UI => new UIActions(this);
         public interface IPlayerActions
         {
             void OnMovement(InputAction.CallbackContext context);
             void OnInteract(InputAction.CallbackContext context);
+        }
+        public interface IUIActions
+        {
         }
     }
 }

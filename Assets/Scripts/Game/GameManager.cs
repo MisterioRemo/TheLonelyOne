@@ -9,6 +9,8 @@ namespace TheLonelyOne
 
     #region PROPERTIES
     public Dictionary<string, GameObject> UIObjects { get; protected set; }
+    public GameObject                     Player { get; protected set; }
+    public Player.PlayerController        PlayerController { get; protected set; }
     #endregion
 
     protected void Awake()
@@ -24,7 +26,9 @@ namespace TheLonelyOne
 
     protected void Start()
     {
-      UIObjects = DecompositeUIsContainer();
+      UIObjects        = DecompositeUIsContainer();
+      Player           = GameObject.FindGameObjectWithTag("Player");
+      PlayerController = Player.GetComponent<Player.PlayerController>();
     }
 
     protected Dictionary<string, GameObject> DecompositeUIsContainer()

@@ -15,7 +15,12 @@ namespace TheLonelyOne.Player
     protected IInteractable interactableObject;
     #endregion
 
-    private void Awake()
+    #region PROPERTIES
+    public bool CanMove { get; set; } = true;
+    #endregion
+
+    #region LIFECYCLE
+    protected void Awake()
     {
       movementCtrl = GetComponent<PlayerMovementController>();
       animator     = GetComponent<Animator>();
@@ -24,17 +29,12 @@ namespace TheLonelyOne.Player
     protected void Start()
     {
       SetUpPlayerInputAction();
-      GameEvents.Instance.OnPlayerMoving += SetUpAnimation;
+      GameEvents.Instance.OnPlayerMoving      += SetUpAnimation;
       GameEvents.Instance.OnPlayerTeleporting += Teleport;
+      GameEvents.Instance.OnAllowPlayerToMove += AllowToMove;
     }
 
-    private void Update()
-    {
-      if (movementCtrl.IsMoving)
-        GameEvents.Instance.PlayerMoving();
-    }
-
-    private void OnDestroy()
+    protected void OnDestroy()
     {
       // Movement
       inputActions.Player.Movement.started  -= movementCtrl.PlayerMovementStarted;
@@ -45,9 +45,12 @@ namespace TheLonelyOne.Player
       inputActions.Player.Movement.performed -= Dialogue.DialogueManager.Instance.ShowNextDialogueChoice;
 
       // Animation
-      GameEvents.Instance.OnPlayerMoving -= SetUpAnimation;
+      GameEvents.Instance.OnPlayerMoving      -= SetUpAnimation;
+
       GameEvents.Instance.OnPlayerTeleporting -= Teleport;
+      GameEvents.Instance.OnAllowPlayerToMove -= AllowToMove;
     }
+    #endregion
 
     protected void SetUpPlayerInputAction()
     {
@@ -88,10 +91,42 @@ namespace TheLonelyOne.Player
       if (interactableObject == _collision.GetComponent<IInteractable>())
         interactableObject = null;
     }
+
+    protected void AllowToMove(bool _canMove)
+    {
+      CanMove = _canMove;
+    }
+
+    #region INTERFACE
     public void Teleport(Vector3 _position)
     {
       transform.position = _position;
     }
+
+    public void ChangeInputActionsMap(InputActionsMap _map)
+    {
+      ChangeInputActionsMap(_map.ToString());
+    }
+
+    public void ChangeInputActionsMap(string _mapName)
+    {
+      switch (_mapName)
+      {
+        case "Player":
+          inputActions.UI.Disable();
+          inputActions.Player.Enable();
+          return;
+
+        case "UI":
+          inputActions.Player.Disable();
+          inputActions.UI.Enable();
+          return;
+
+        default:
+          return;
+      }
+    }
+    #endregion
   }
 
 }

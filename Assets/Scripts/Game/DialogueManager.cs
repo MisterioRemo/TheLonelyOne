@@ -90,6 +90,8 @@ namespace TheLonelyOne.Dialogue
       IsDialoguePlaying      = true;
       updateInkStateCallback = _updateInkStateCallback;
 
+      GameEvents.Instance.AllowPlayerToMove(false);
+
       SetStoryState(inkStory, _inkState);
       Parser.ParseTags(inkStory.globalTags);
       ContinueDialogue();
@@ -142,6 +144,7 @@ namespace TheLonelyOne.Dialogue
     public void EndDialogue()
     {
       updateInkStateCallback(inkStory.state.ToJson());
+      GameEvents.Instance.AllowPlayerToMove(true);
       ResetParameters();
     }
 

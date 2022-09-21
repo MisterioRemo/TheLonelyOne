@@ -43,6 +43,7 @@ namespace TheLonelyOne
 
     protected IEnumerator StartTransition()
     {
+      GameEvents.Instance.AllowPlayerToMove(false);
       transitionUI.SetActive(true);
       yield return new WaitForSeconds(transitionStartDuration);
 
@@ -56,6 +57,7 @@ namespace TheLonelyOne
       yield return new WaitForSeconds(transitionEndDuration);
 
       transitionUI.SetActive(false);
+      GameEvents.Instance.AllowPlayerToMove(true);
     }
   }
 }

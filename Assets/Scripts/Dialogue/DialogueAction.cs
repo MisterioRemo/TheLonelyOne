@@ -32,6 +32,7 @@ namespace TheLonelyOne.Dialogue
         return;
       }
 
+      GameManager.Instance.PlayerController.ChangeInputActionsMap(Player.InputActionsMap.UI);
       canvas.SetActive(true);
     }
   }

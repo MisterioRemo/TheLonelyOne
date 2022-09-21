@@ -24,6 +24,7 @@ namespace TheLonelyOne
     #region PLAYER
     public event Action          OnPlayerMoving;
     public event Action<Vector3> OnPlayerTeleporting;
+    public event Action<bool>    OnAllowPlayerToMove;
 
     public void PlayerMoving()
     {
@@ -33,6 +34,11 @@ namespace TheLonelyOne
     public void PlayerTeleporting(Vector3 _position)
     {
       OnPlayerTeleporting?.Invoke(_position);
+    }
+
+    public void AllowPlayerToMove(bool _canMove)
+    {
+      OnAllowPlayerToMove?.Invoke(_canMove);
     }
     #endregion
 

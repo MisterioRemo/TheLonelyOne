@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 
@@ -39,12 +39,18 @@ namespace TheLonelyOne.Player
 
     protected void Awake()
     {
-      rigidbody2d  = GetComponent<Rigidbody2D>();
+      rigidbody2d = GetComponent<Rigidbody2D>();
     }
 
     protected void Update()
     {
-      if (Dialogue.DialogueManager.Instance.IsDialoguePlaying)
+      if (IsMoving)
+        GameEvents.Instance.PlayerMoving();
+    }
+
+    protected void FixedUpdate()
+    {
+      if (!GameManager.Instance.PlayerController.CanMove)
         return;
 
       IsMoving = false;
@@ -53,10 +59,7 @@ namespace TheLonelyOne.Player
         Move(1.0f);
 
       if (!IsWalking && CurrentSpeed > 0.01f)
-      {
         Drag(friction);
-        IsMoving = true;
-      }
     }
 
     internal void PlayerMovementStarted(CallbackContext _context)
@@ -90,6 +93,7 @@ namespace TheLonelyOne.Player
       force *= -Mathf.Sign(rigidbody2d.velocity.x);
 
       rigidbody2d.AddForce(force * Vector2.right, ForceMode2D.Impulse);
+      IsMoving = true;
     }
   }
 }
