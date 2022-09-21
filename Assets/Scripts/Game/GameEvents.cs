@@ -22,11 +22,17 @@ namespace TheLonelyOne
     }
 
     #region PLAYER
-    public event Action OnPlayerMoving;
+    public event Action          OnPlayerMoving;
+    public event Action<Vector3> OnPlayerTeleporting;
 
     public void PlayerMoving()
     {
       OnPlayerMoving?.Invoke();
+    }
+
+    public void PlayerTeleporting(Vector3 _position)
+    {
+      OnPlayerTeleporting?.Invoke(_position);
     }
     #endregion
 

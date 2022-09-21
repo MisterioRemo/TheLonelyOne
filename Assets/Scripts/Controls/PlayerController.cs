@@ -23,6 +23,7 @@ namespace TheLonelyOne.Player
     {
       SetUpPlayerInputAction();
       GameEvents.Instance.OnPlayerMoving += SetUpAnimation;
+      GameEvents.Instance.OnPlayerTeleporting += Teleport;
     }
 
     private void Update()
@@ -43,6 +44,7 @@ namespace TheLonelyOne.Player
 
       // Animation
       GameEvents.Instance.OnPlayerMoving -= SetUpAnimation;
+      GameEvents.Instance.OnPlayerTeleporting -= Teleport;
     }
 
     private void SetUpPlayerInputAction()
@@ -83,6 +85,10 @@ namespace TheLonelyOne.Player
     {
       if (interactableObject == _collision.gameObject.GetComponent<IInteractable>())
         interactableObject = null;
+    }
+    public void Teleport(Vector3 _position)
+    {
+      transform.position = _position;
     }
   }
 
