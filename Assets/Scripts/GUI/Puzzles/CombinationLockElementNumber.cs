@@ -36,7 +36,7 @@ namespace TheLonelyOne.UI
     public event Action OnSymbolChange;
 
     public char Symbol { get => (char)(Number + 48);
-                         set => Number = Math.Max('0', Math.Min('9', value)) - 48;
+                         set => Number = Mathf.Max('0', Mathf.Min('9', value)) - 48;
                        }
 
     public void GoToNextSymbol()

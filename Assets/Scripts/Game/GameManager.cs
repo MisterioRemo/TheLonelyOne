@@ -5,13 +5,13 @@ namespace TheLonelyOne
 {
   public class GameManager : MonoBehaviour
   {
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance { get; protected set; }
 
     #region PROPERTIES
-    public Dictionary<string, GameObject> UIObjects { get; private set; }
+    public Dictionary<string, GameObject> UIObjects { get; protected set; }
     #endregion
 
-    private void Awake()
+    protected void Awake()
     {
       if (Instance != null && Instance != this)
       {
@@ -22,12 +22,12 @@ namespace TheLonelyOne
       Instance = this;
     }
 
-    private void Start()
+    protected void Start()
     {
       UIObjects = DecompositeUIsContainer();
     }
 
-    private Dictionary<string, GameObject> DecompositeUIsContainer()
+    protected Dictionary<string, GameObject> DecompositeUIsContainer()
     {
       Transform UIsContainer = GameObject.Find("UIs").transform;
       var       children     = new Dictionary<string, GameObject>();

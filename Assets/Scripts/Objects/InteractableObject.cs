@@ -6,14 +6,22 @@ namespace TheLonelyOne
 {
   public class InteractableObject : MonoBehaviour, IInteractable
   {
-    #region COMPONENTS
-    [SerializeField] protected GameObject icon;
-    #endregion
-
     #region PARAMETERS
+    protected GameObject icon;
+
     [Header("Data Persistence")]
     [SerializeField] protected string           id;
     [SerializeField] protected List<GameObject> childObjectToSave;
+    #endregion
+
+    #region PROPERTIES
+    public bool IconVisability { get => icon ? icon.activeSelf : false;
+                                 private set
+                                 {
+                                   if (icon)
+                                     icon.SetActive(value);
+                                 }
+                               }
     #endregion
 
     [ContextMenu("Generate guid fo id")]
@@ -31,7 +39,7 @@ namespace TheLonelyOne
     {
       if (string.IsNullOrEmpty(id))
       {
-        Debug.LogError($"Can't save {name} object: id is null or empty.");
+        Debug.LogError($"Can't save '{name}' object: id is null or empty.");
         return;
       }
 
@@ -89,16 +97,21 @@ namespace TheLonelyOne
     }
     #endregion
 
+    protected virtual void Awake()
+    {
+      icon = transform.Find("Icon").gameObject;
+    }
+
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
-      if (icon && _collision.gameObject.tag == "Player")
-        icon.SetActive(true);
+      if (_collision.CompareTag("Player"))
+        IconVisability = true;
     }
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
-      if (icon && _collision.gameObject.tag == "Player")
-        icon.SetActive(false);
+      if (_collision.CompareTag("Player"))
+        IconVisability = false;
     }
 
   }

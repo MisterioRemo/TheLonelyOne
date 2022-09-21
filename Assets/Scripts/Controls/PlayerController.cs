@@ -6,12 +6,14 @@ namespace TheLonelyOne.Player
   public class PlayerController : MonoBehaviour, ICharacter
   {
     #region COMPONENTS
-    private PlayerInputActions       inputActions;
-    private PlayerMovementController movementCtrl;
-    private Animator                 animator;
+    protected PlayerInputActions       inputActions;
+    protected PlayerMovementController movementCtrl;
+    protected Animator                 animator;
     #endregion
 
-    private IInteractable interactableObject;
+    #region PARAMETERS
+    protected IInteractable interactableObject;
+    #endregion
 
     private void Awake()
     {
@@ -19,7 +21,7 @@ namespace TheLonelyOne.Player
       animator     = GetComponent<Animator>();
     }
 
-    private void Start()
+    protected void Start()
     {
       SetUpPlayerInputAction();
       GameEvents.Instance.OnPlayerMoving += SetUpAnimation;
@@ -47,7 +49,7 @@ namespace TheLonelyOne.Player
       GameEvents.Instance.OnPlayerTeleporting -= Teleport;
     }
 
-    private void SetUpPlayerInputAction()
+    protected void SetUpPlayerInputAction()
     {
       inputActions = new PlayerInputActions();
 
@@ -62,28 +64,28 @@ namespace TheLonelyOne.Player
       inputActions.Player.Movement.performed += Dialogue.DialogueManager.Instance.ShowNextDialogueChoice;
     }
 
-    private void SetUpAnimation()
+    protected void SetUpAnimation()
     {
       animator.SetBool("IsWalking", movementCtrl.IsWalking);
       animator.SetFloat("Direction", movementCtrl.Direction);
       animator.SetFloat("Speed", Mathf.Abs(movementCtrl.CurrentVelocity));
     }
 
-    private void InteractionPressed(CallbackContext _context)
+    protected void InteractionPressed(CallbackContext _context)
     {
       if (interactableObject != null)
         interactableObject.Interact();
     }
 
-    private void OnTriggerEnter2D(Collider2D _collision)
+    protected void OnTriggerEnter2D(Collider2D _collision)
     {
-      if (_collision.gameObject.GetComponentInChildren<IInteractable>() is IInteractable interactable)
+      if (_collision.GetComponentInChildren<IInteractable>() is IInteractable interactable)
         interactableObject = interactable;
     }
 
-    private void OnTriggerExit2D(Collider2D _collision)
+    protected void OnTriggerExit2D(Collider2D _collision)
     {
-      if (interactableObject == _collision.gameObject.GetComponent<IInteractable>())
+      if (interactableObject == _collision.GetComponent<IInteractable>())
         interactableObject = null;
     }
     public void Teleport(Vector3 _position)

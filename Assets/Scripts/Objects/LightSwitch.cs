@@ -28,12 +28,12 @@ namespace TheLonelyOne
     [SerializeField] private List<SwitchStatePair> switchStates;
     #endregion
 
-    #region PROPERTIES
-    public SwitchState State { get => currentState; }
-    #endregion
-
     #region PARAMETERS
     [SerializeField] private SwitchState currentState;
+    #endregion
+
+    #region PROPERTIES
+    public SwitchState State { get => currentState; }
     #endregion
 
     #region INTERACTABLE OBJECT
@@ -64,8 +64,10 @@ namespace TheLonelyOne
     }
     #endregion
 
-    protected void Awake()
+    protected override void Awake()
     {
+      base.Awake();
+
       states         = new Dictionary<SwitchState, Sprite>();
       spriteRenderer = GetComponent<SpriteRenderer>();
 

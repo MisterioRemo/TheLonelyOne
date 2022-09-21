@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 
@@ -11,37 +11,38 @@ namespace TheLonelyOne.Player
   public class PlayerMovementController : MonoBehaviour
   {
     #region COMPONENTS
-    private Rigidbody2D rigidbody2d;
+    protected Rigidbody2D rigidbody2d;
     #endregion
 
     #region PARAMETERS
-    private Vector2 inputVetor;
+    protected Vector2 inputVetor;
 
-    [SerializeField] private float walkingSpeed;
-    [SerializeField] private float runnigSpeed;
-    [SerializeField] private float acceleration;
-    [SerializeField] private float decceleration;
-    [SerializeField] private float velocityPower;
-    [SerializeField] private float friction;
+    [SerializeField] protected float walkingSpeed;
+    [SerializeField] protected float runnigSpeed;
+    [SerializeField] protected float acceleration;
+    [SerializeField] protected float decceleration;
+    [SerializeField] protected float velocityPower;
+    [SerializeField] protected float friction;
     #endregion
 
     #region PROPERTIES
-    public bool  IsWalking { get; private set; }
-    public bool  IsRunnnig { get; private set; }
+    public bool  IsWalking { get; protected set; }
+    public bool  IsRunnnig { get; protected set; }
     /// <summary>
     /// Return true if player is not walking/running or sliding (aka rigidbody2d.velocity.x = 0).
     /// </summary>
-    public bool  IsMoving { get; private set; }
+    public bool  IsMoving { get; protected set; }
     public float CurrentVelocity { get => rigidbody2d.velocity.x; }
-    public int   Direction { get; private set; }
+    public float CurrentSpeed { get => Mathf.Abs(CurrentVelocity); }
+    public int   Direction { get; protected set; }
     #endregion
 
-    private void Awake()
+    protected void Awake()
     {
       rigidbody2d  = GetComponent<Rigidbody2D>();
     }
 
-    private void FixedUpdate()
+    protected void Update()
     {
       if (Dialogue.DialogueManager.Instance.IsDialoguePlaying)
         return;
@@ -51,7 +52,7 @@ namespace TheLonelyOne.Player
       if (IsWalking)
         Move(1.0f);
 
-      if (!IsWalking && Mathf.Abs(rigidbody2d.velocity.x) > 0.01f)
+      if (!IsWalking && CurrentSpeed > 0.01f)
       {
         Drag(friction);
         IsMoving = true;
@@ -69,7 +70,7 @@ namespace TheLonelyOne.Player
       IsWalking = false;
     }
 
-    private void Move(float _lerpValue)
+    protected void Move(float _lerpValue)
     {
       float targetSpeed = inputVetor.x * walkingSpeed;
       float deltaSpeed  = targetSpeed - rigidbody2d.velocity.x;
@@ -83,7 +84,7 @@ namespace TheLonelyOne.Player
       IsMoving  = true;
     }
 
-    private void Drag(float _amount)
+    protected void Drag(float _amount)
     {
       float force = Mathf.Abs(rigidbody2d.velocity.x) * _amount;
       force *= -Mathf.Sign(rigidbody2d.velocity.x);
