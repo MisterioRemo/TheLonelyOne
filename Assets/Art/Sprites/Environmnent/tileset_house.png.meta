@@ -607,7 +607,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: door_0
+      name: door_1
       rect:
         serializedVersion: 2
         x: 841
@@ -628,7 +628,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: door_1
+      name: door_2
       rect:
         serializedVersion: 2
         x: 891
@@ -878,7 +878,7 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       hall_refrigerator_0: -1287408116
-      door_1: -446045239
+      door_1: -457750588
       bathroom_bg: 1543878969
       mirror_0: -766621147
       cup_1: 1306931029
@@ -902,8 +902,8 @@ TextureImporter:
       cup_3: 344896789
       kitchen_front: 1666354408
       cup_2: 236905183
-      door_0: -457750588
       door_4: -1951518957
+      door_2: -446045239
       main_room_bg: -1392054555
       mirror_1: -1959646023
       switch_1: -2060219776
