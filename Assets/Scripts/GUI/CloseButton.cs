@@ -1,16 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace TheLonelyOne.UI
 {
   [RequireComponent(typeof(Button))]
   public class CloseButton : MonoBehaviour
   {
-    #region COMPONENTS
-    [SerializeField] protected GameObject targetUI;
-    #endregion
-
     #region PARAMETERS
+    [SerializeField] protected GameObject targetUI;
+
+    [Inject] protected Player.PlayerController playerCtrl;
+
     protected Button closeButton;
     #endregion
 
@@ -30,7 +31,7 @@ namespace TheLonelyOne.UI
     protected void CloseUI()
     {
       targetUI.SetActive(false);
-      GameManager.Instance.PlayerController.ChangeInputActionsMap(Player.InputActionsMap.Player);
+      playerCtrl.ChangeInputActionsMap(Player.InputActionsMap.Player);
     }
   }
 }

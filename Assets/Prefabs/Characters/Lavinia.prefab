@@ -14,8 +14,6 @@ GameObject:
   - component: {fileID: 8957647983587011023}
   - component: {fileID: 2912534109986370179}
   - component: {fileID: 6339190454722291891}
-  - component: {fileID: 4197650863309310041}
-  - component: {fileID: 4197650863309310038}
   - component: {fileID: 5123128251209780665}
   m_Layer: 0
   m_Name: Lavinia
@@ -175,36 +173,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &4197650863309310041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4197650863309310045}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 993ce8fe1280a914fb4954a4a90057ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4197650863309310038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4197650863309310045}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd6eeaa5a2871de4ebeb9feed0de3235, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  walkingSpeed: 60
-  runnigSpeed: 0
-  acceleration: 10
-  decceleration: 13
-  velocityPower: 0.9
-  friction: 2
 --- !u!114 &5123128251209780665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,7 +199,7 @@ MonoBehaviour:
   - {x: -0.011545181, y: 0.26441598, z: 0}
   m_ShapePathHash: 1549069885
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1276
+  m_InstanceId: 47930
 --- !u!1001 &4197650863914118939
 PrefabInstance:
   m_ObjectHideFlags: 0

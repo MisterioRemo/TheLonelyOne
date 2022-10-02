@@ -1,19 +1,21 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace TheLonelyOne
 {
   public class Teleport : InteractableObject
   {
     #region PARAMETERS
+    protected Animator transition;
+
     [SerializeField] protected Transform  destination;
     [SerializeField] protected GameObject transitionUI;
     [SerializeField] protected float      transitionStartDuration = 1.0f;
     [SerializeField] protected float      transitionDuration = 0.5f;
     [SerializeField] protected float      transitionEndDuration   = 1.0f;
 
-    protected Animator transition;
+    [Inject] protected Player.PlayerController playerCtrl;
     #endregion
 
     #region INTERACTABLE OBJECT
@@ -43,13 +45,13 @@ namespace TheLonelyOne
 
     protected IEnumerator StartTransition()
     {
-      GameEvents.Instance.AllowPlayerToMove(false);
+      playerCtrl.CanMove = false;
       transitionUI.SetActive(true);
       yield return new WaitForSeconds(transitionStartDuration);
 
       if (destination != null)
       {
-        GameEvents.Instance.PlayerTeleporting(destination.position);
+        playerCtrl.Teleport(destination.position);
         yield return new WaitForSeconds(transitionDuration);
       }
 
@@ -57,7 +59,7 @@ namespace TheLonelyOne
       yield return new WaitForSeconds(transitionEndDuration);
 
       transitionUI.SetActive(false);
-      GameEvents.Instance.AllowPlayerToMove(true);
+      playerCtrl.CanMove = true;
     }
   }
 }

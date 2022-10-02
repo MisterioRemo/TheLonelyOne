@@ -1,85 +1,79 @@
+using System;
 using UnityEngine;
+using Zenject;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 namespace TheLonelyOne.Player
 {
   public class PlayerController : MonoBehaviour, ICharacter
   {
-    #region COMPONENTS
-    protected PlayerInputActions       inputActions;
-    protected PlayerMovementController movementCtrl;
-    protected Animator                 animator;
-    #endregion
-
     #region PARAMETERS
+    protected Animator      animator;
     protected IInteractable interactableObject;
+
+    [Inject] protected PlayerInputActions       inputActions;
+    [Inject] protected PlayerMovementController movementCtrl;
     #endregion
 
     #region PROPERTIES
     public bool CanMove { get; set; } = true;
     #endregion
 
+    #region EVENTS
+    public event Action<Vector3> OnTeleporting;
+    #endregion
+
     #region LIFECYCLE
-    protected void Awake()
+    protected virtual void Awake()
     {
-      movementCtrl = GetComponent<PlayerMovementController>();
-      animator     = GetComponent<Animator>();
+      animator = GetComponent<Animator>();
     }
 
-    protected void Start()
+    protected virtual void Start()
     {
-      SetUpPlayerInputAction();
-      GameEvents.Instance.OnPlayerMoving      += SetUpAnimation;
-      GameEvents.Instance.OnPlayerTeleporting += Teleport;
-      GameEvents.Instance.OnAllowPlayerToMove += AllowToMove;
+      inputActions.Player.Interact.performed += InteractionPressed;
+
+      movementCtrl.OnMovingStateChange += SetWalkingAnimation;
+      movementCtrl.OnDirectionChange   += SetDirectionAnimation;
+      movementCtrl.OnSpeedChange       += SetSpeedAnimation;
     }
 
-    protected void OnDestroy()
+    protected virtual void OnDestroy()
     {
-      // Movement
-      inputActions.Player.Movement.started  -= movementCtrl.PlayerMovementStarted;
-      inputActions.Player.Movement.canceled -= movementCtrl.PlayerMovementCanceled;
-
-      // Interaction
       inputActions.Player.Interact.performed -= InteractionPressed;
-      inputActions.Player.Movement.performed -= Dialogue.DialogueManager.Instance.ShowNextDialogueChoice;
 
-      // Animation
-      GameEvents.Instance.OnPlayerMoving      -= SetUpAnimation;
-
-      GameEvents.Instance.OnPlayerTeleporting -= Teleport;
-      GameEvents.Instance.OnAllowPlayerToMove -= AllowToMove;
+      movementCtrl.OnMovingStateChange -= SetWalkingAnimation;
+      movementCtrl.OnDirectionChange   -= SetDirectionAnimation;
+      movementCtrl.OnSpeedChange       -= SetSpeedAnimation;
     }
     #endregion
 
-    protected void SetUpPlayerInputAction()
-    {
-      inputActions = new PlayerInputActions();
-
-      inputActions.Player.Enable();
-
-      // Movement
-      inputActions.Player.Movement.started  += movementCtrl.PlayerMovementStarted;
-      inputActions.Player.Movement.canceled += movementCtrl.PlayerMovementCanceled;
-
-      // Interaction
-      inputActions.Player.Interact.performed += InteractionPressed;
-      inputActions.Player.Movement.performed += Dialogue.DialogueManager.Instance.ShowNextDialogueChoice;
-    }
-
-    protected void SetUpAnimation()
-    {
-      animator.SetBool("IsWalking", movementCtrl.IsWalking);
-      animator.SetFloat("Direction", movementCtrl.Direction);
-      animator.SetFloat("Speed", Mathf.Abs(movementCtrl.CurrentVelocity));
-    }
-
+    #region INPUT ACTIONS CALLBACKS
     protected void InteractionPressed(CallbackContext _context)
     {
       if (interactableObject != null)
         interactableObject.Interact();
     }
+    #endregion
 
+    #region ANIMATION CALLBACKS
+    protected void SetWalkingAnimation(bool _isWalking)
+    {
+      animator.SetBool("IsWalking", _isWalking);
+    }
+
+    protected void SetDirectionAnimation(int _direction)
+    {
+      animator.SetFloat("Direction", _direction);
+    }
+
+    protected void SetSpeedAnimation(float _speed)
+    {
+      animator.SetFloat("Speed", _speed);
+    }
+    #endregion
+
+    #region COLLISIONS
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
       if (_collision.GetComponentInChildren<IInteractable>() is IInteractable interactable)
@@ -91,16 +85,13 @@ namespace TheLonelyOne.Player
       if (interactableObject == _collision.GetComponent<IInteractable>())
         interactableObject = null;
     }
-
-    protected void AllowToMove(bool _canMove)
-    {
-      CanMove = _canMove;
-    }
+    #endregion
 
     #region INTERFACE
     public void Teleport(Vector3 _position)
     {
       transform.position = _position;
+      OnTeleporting?.Invoke(_position);
     }
 
     public void ChangeInputActionsMap(InputActionsMap _map)
@@ -128,5 +119,4 @@ namespace TheLonelyOne.Player
     }
     #endregion
   }
-
 }

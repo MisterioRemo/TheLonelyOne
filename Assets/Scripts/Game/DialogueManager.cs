@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Ink.Runtime;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
+using Zenject;
 
 namespace TheLonelyOne.Dialogue
 {
@@ -19,6 +20,8 @@ namespace TheLonelyOne.Dialogue
     private Dictionary<string, DialogueParticipant> participants;
 
     private Action<string>                          updateInkStateCallback;
+
+    [Inject] protected Player.PlayerController playerCtrl;
     #endregion
 
     #region PROPERTIES
@@ -89,8 +92,7 @@ namespace TheLonelyOne.Dialogue
       inkStory               = new Story(_inkAsset.text);
       IsDialoguePlaying      = true;
       updateInkStateCallback = _updateInkStateCallback;
-
-      GameEvents.Instance.AllowPlayerToMove(false);
+      playerCtrl.CanMove     = false;
 
       SetStoryState(inkStory, _inkState);
       Parser.ParseTags(inkStory.globalTags);
@@ -144,7 +146,7 @@ namespace TheLonelyOne.Dialogue
     public void EndDialogue()
     {
       updateInkStateCallback(inkStory.state.ToJson());
-      GameEvents.Instance.AllowPlayerToMove(true);
+      playerCtrl.CanMove = true;
       ResetParameters();
     }
 

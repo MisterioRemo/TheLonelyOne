@@ -1,10 +1,13 @@
 using System.Reflection;
 using UnityEngine;
+using Zenject;
 
 namespace TheLonelyOne.Dialogue
 {
   public class DialogueAction
   {
+    [Inject] protected static Player.PlayerController playerCtrl;
+
     public static void Invoke(string _methodName, params string[] _params)
     {
       MethodInfo method = typeof(DialogueAction).GetMethod(_methodName);
@@ -32,7 +35,7 @@ namespace TheLonelyOne.Dialogue
         return;
       }
 
-      GameManager.Instance.PlayerController.ChangeInputActionsMap(Player.InputActionsMap.UI);
+      playerCtrl.ChangeInputActionsMap(Player.InputActionsMap.UI);
       canvas.SetActive(true);
     }
   }
