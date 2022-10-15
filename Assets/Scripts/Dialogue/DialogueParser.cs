@@ -6,10 +6,19 @@ namespace TheLonelyOne.Dialogue
 {
   public partial class DialogueManager
   {
-    public static class Parser
+    public class DialogueParser
     {
+      #region PARAMETERS
+      protected readonly DialogueManager parent;
+      #endregion
+
+      public DialogueParser(DialogueManager _dialogueManager)
+      {
+        parent = _dialogueManager;
+      }
+
       #region FUNCTIONS
-      internal static bool ParseFunction(string _text, out string _functionName, out string[] _params)
+      internal bool ParseFunction(string _text, out string _functionName, out string[] _params)
       {
         if (!_text.StartsWith('>'))
         {
@@ -30,16 +39,16 @@ namespace TheLonelyOne.Dialogue
         return true;
       }
 
-      public static GameObject ParseFuctionTarget(string _targetName)
+      public GameObject ParseFuctionTarget(string _targetName)
       {
         string[] hierarchy     = _targetName.Split('/', 2);
         string participantName = hierarchy[0].ToLower();
 
-        if (Instance.participants.ContainsKey(participantName))
+        if (parent.participants.ContainsKey(participantName))
         {
           return hierarchy.Length > 1
-                 ? Instance.participants[participantName].transform.root.Find(hierarchy[1]).gameObject
-                 : Instance.participants[participantName].transform.root.gameObject;
+                 ? parent.participants[participantName].transform.root.Find(hierarchy[1]).gameObject
+                 : parent.participants[participantName].transform.root.gameObject;
         }
 
         return GameObject.Find(_targetName);
@@ -47,16 +56,16 @@ namespace TheLonelyOne.Dialogue
       #endregion
 
       #region TAGS
-      public static List<string> GetCustomTags(string _text)
+      public List<string> GetCustomTags(string _text)
       {
         return _text
                 .Split(' ')
                 .Where(x => x.StartsWith('$'))
-                .Select(x => x.Substring(1))
+                .Select(x => x[1..])
                 .ToList();
       }
 
-      public static void ParseTags(List<string> _tags)
+      public void ParseTags(List<string> _tags)
       {
         if (_tags == null)
           return;
@@ -72,7 +81,7 @@ namespace TheLonelyOne.Dialogue
         }
       }
 
-      private static void ParseSingleTag(string _tag)
+      private void ParseSingleTag(string _tag)
       {
         switch (_tag)
         {
@@ -81,12 +90,12 @@ namespace TheLonelyOne.Dialogue
         }
       }
 
-      private static void ParseParameterizedTag(string[] _tags)
+      private void ParseParameterizedTag(string[] _tags)
       {
         switch (_tags[0])
         {
           case "speaker":
-            Instance.currentParticipantName = _tags[1];
+            parent.currentParticipantName = _tags[1];
             return;
 
           default:

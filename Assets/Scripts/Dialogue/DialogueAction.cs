@@ -6,26 +6,27 @@ namespace TheLonelyOne.Dialogue
 {
   public class DialogueAction
   {
-    [Inject] protected static Player.PlayerController playerCtrl;
+    [Inject] protected Player.PlayerController playerCtrl;
+    [Inject] protected DialogueManager         dialogueManager;
 
-    public static void Invoke(string _methodName, params string[] _params)
+    public void Invoke(string _methodName, params string[] _params)
     {
       MethodInfo method = typeof(DialogueAction).GetMethod(_methodName);
-      method?.Invoke(null, _params);
+      method?.Invoke(this, _params);
     }
 
-    public static void SetPosition(string _targetName, string _position)
+    public void SetPosition(string _targetName, string _position)
     {
-      SetPositionImplementation(DialogueManager.Parser.ParseFuctionTarget(_targetName),
+      SetPositionImplementation(dialogueManager.Parser.ParseFuctionTarget(_targetName),
                                 Utils.ParseToVector3(_position));
     }
 
-    public static void SetPositionImplementation(GameObject _gameObject, Vector3 _position)
+    public void SetPositionImplementation(GameObject _gameObject, Vector3 _position)
     {
       _gameObject.transform.position = _position;
     }
 
-    public static void ShowUI(string _canvasName)
+    public void ShowUI(string _canvasName)
     {
       GameManager.Instance.UIObjects.TryGetValue(_canvasName, out GameObject canvas);
 

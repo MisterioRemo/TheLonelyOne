@@ -8,7 +8,6 @@ namespace TheLonelyOne
     public GameObject GameManager;
     public GameObject SaveSystem;
     public GameObject GameEvents;
-    public GameObject DialogueManager;
     #endregion
 
     private void Awake()
@@ -23,9 +22,6 @@ namespace TheLonelyOne
 
       if (TheLonelyOne.GameEvents.Instance == null)
         Instantiate(GameEvents);
-
-      if (Dialogue.DialogueManager.Instance == null)
-        Instantiate(DialogueManager);
     }
   }
 }
