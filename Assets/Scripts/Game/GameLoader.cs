@@ -6,7 +6,6 @@ namespace TheLonelyOne
   {
     #region CONTROLLERS
     public GameObject GameManager;
-    public GameObject SaveSystem;
     public GameObject GameEvents;
     #endregion
 
@@ -16,9 +15,6 @@ namespace TheLonelyOne
 
       if (TheLonelyOne.GameManager.Instance == null)
         Instantiate(GameManager);
-
-      if (TheLonelyOne.SaveSystem.Instance == null)
-        Instantiate(SaveSystem);
 
       if (TheLonelyOne.GameEvents.Instance == null)
         Instantiate(GameEvents);
