@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Ink.Runtime;
@@ -19,11 +19,11 @@ namespace TheLonelyOne.Dialogue
 
     protected Action<string>                          updateInkStateCallback;
 
-    public readonly DialogueParser Parser;
+    public    readonly DialogueParser Parser;
+    protected          DialogueAction dialogueAction;
 
     [Inject] protected Player.PlayerController playerCtrl;
     [Inject] protected PlayerInputActions      inputActions;
-    [Inject] protected DialogueAction          dialogueAction;
     #endregion
 
     #region PROPERTIES
@@ -43,13 +43,16 @@ namespace TheLonelyOne.Dialogue
 
     public DialogueManager()
     {
-      participants = new Dictionary<string, DialogueParticipant>();
-      Parser       = new DialogueParser(this);
+      participants   = new Dictionary<string, DialogueParticipant>();
+      Parser         = new DialogueParser(this);
     }
 
     #region IInitializable
     public void Initialize()
     {
+      // т.к. DialogueAction использует Inject, то приходится создавать объект через DiContainer
+      dialogueAction = DiContainerRef.Container.Instantiate<DialogueAction>(new object[] { this });
+
       inputActions.Player.Movement.performed += ShowNextDialogueChoice;
 
       ResetParameters();
