@@ -11,16 +11,12 @@ namespace TheLonelyOne
       StayFixed
     }
 
-    #region COMPONENTS
-    [SerializeField] protected Rigidbody2D target;
-
-    protected BoxCollider2D boxCollider;
-    #endregion
-
     #region PARAMETERS
-    [SerializeField] protected float interpolationSpeed;
-    [SerializeField] protected Vector2 offset;
+    [SerializeField] protected Rigidbody2D target;
+    [SerializeField] protected float       interpolationSpeed;
+    [SerializeField] protected Vector2     offset;
 
+    protected BoxCollider2D     boxCollider;
     protected float             horizontalDirection;
     protected Vector3           fixedPosition;
     protected UnfixingCondition unfixingCondition;
@@ -39,11 +35,9 @@ namespace TheLonelyOne
     {
       boxCollider      = GetComponent<BoxCollider2D>();
       boxCollider.size = CalculateColliderSize(GetComponent<Camera>());
-    }
 
-    protected void Start()
-    {
-      GameEvents.Instance.OnPlayerTeleporting += OnPlayerTeleport;
+      if (target && target.GetComponent<Player.PlayerController>() is Player.PlayerController playerCtrl)
+        playerCtrl.OnTeleporting += Teleport;
     }
 
     protected void LateUpdate()
@@ -62,10 +56,12 @@ namespace TheLonelyOne
 
     protected void OnDestroy()
     {
-      GameEvents.Instance.OnPlayerTeleporting -= OnPlayerTeleport;
+      if (target && target.GetComponent<Player.PlayerController>() is Player.PlayerController playerCtrl)
+        playerCtrl.OnTeleporting -= Teleport;
     }
     #endregion
 
+    #region METHODS
     protected Vector3 CalculateCameraPosition(Vector3 _targetPosition)
     {
       return new Vector3(_targetPosition.x + offset.x,
@@ -95,11 +91,12 @@ namespace TheLonelyOne
       }
     }
 
-    protected void OnPlayerTeleport(Vector3 _position)
+    protected void Teleport(Vector3 _position)
     {
       InstantCameraMove(_position);
       IsPositionFixed = false;
     }
+    #endregion
 
     #region INTERFACE
     public void InstantCameraMove(Vector3 _position)

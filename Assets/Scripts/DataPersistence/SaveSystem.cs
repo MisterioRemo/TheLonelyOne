@@ -1,46 +1,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Zenject;
+using System;
 
 namespace TheLonelyOne
 {
   public class SaveSystem : MonoBehaviour
   {
-    public static SaveSystem Instance { get; private set; }
-
     #region PARAMETERS
-    [SerializeField] private string fileName;
-    [SerializeField] private bool   useEncryption;
-
-    private GameData               gameData;
-    private List<IDataPersistence> dataPersistenceObjects;
-    private PersistentDataHandler  persistentDataHandler;
+    protected string                 fileName;
+    protected bool                   useEncryption;
+    protected GameData               gameData;
+    protected List<IDataPersistence> dataPersistenceObjects;
+    protected PersistentDataHandler  persistentDataHandler;
     #endregion
 
-    private void Awake()
+    [Inject]
+    public void Init(string _fileName, bool _useEncryption)
     {
-      if (Instance != null && Instance != this)
-      {
-        Destroy(this);
-        return;
-      }
-
-      Instance = this;
-      gameData = new GameData();
+      fileName      = _fileName;
+      useEncryption = _useEncryption;
     }
 
-    private void Start()
+    #region LIFECYCLE
+    protected void Start()
     {
+      gameData               = new GameData();
       persistentDataHandler  = new PersistentDataHandler(Application.persistentDataPath, fileName, useEncryption);
       dataPersistenceObjects = FindAllDataPersistenceObjects();
       LoadGame();
     }
 
-    private void OnApplicationQuit()
+    protected void OnApplicationQuit()
     {
       SaveGame();
     }
+    #endregion
 
+    #region INTREFACE
     public void NewGame()
     {
       gameData = new GameData();
@@ -64,10 +62,19 @@ namespace TheLonelyOne
 
       persistentDataHandler.Save(gameData);
     }
+    #endregion
 
-    private List<IDataPersistence> FindAllDataPersistenceObjects()
+    #region METHODS
+    protected void FocusChangedCallback(bool _hasFocus)
+    {
+      if (!_hasFocus)
+        SaveGame();
+    }
+
+    protected List<IDataPersistence> FindAllDataPersistenceObjects()
     {
       return FindObjectsOfType<MonoBehaviour>(true).OfType<IDataPersistence>().ToList();
     }
+    #endregion
   }
 }

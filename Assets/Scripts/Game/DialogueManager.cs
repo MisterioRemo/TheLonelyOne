@@ -1,68 +1,70 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Ink.Runtime;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
+using Zenject;
 
 namespace TheLonelyOne.Dialogue
 {
-  public partial class DialogueManager : MonoBehaviour
+  public partial class DialogueManager : IInitializable, IDisposable
   {
-    public static DialogueManager Instance { get; private set; }
-
     #region PARAMETERS
-    private Story                                   inkStory;
-    private string                                  currentParticipantName;
-    private int                                     currentChoiceIndex;
-    private bool                                    isChoiceIndexSelected;
-    private bool                                    isChoosingChoie;
-    private Dictionary<string, DialogueParticipant> participants;
+    protected Story                                   inkStory;
+    protected string                                  currentParticipantName;
+    protected int                                     currentChoiceIndex;
+    protected bool                                    isChoiceIndexSelected;
+    protected bool                                    isChoosingChoie;
+    protected Dictionary<string, DialogueParticipant> participants;
 
-    private Action<string>                          updateInkStateCallback;
+    protected Action<string>                          updateInkStateCallback;
+
+    public    readonly DialogueParser Parser;
+    protected          DialogueAction dialogueAction;
+
+    [Inject] protected Player.PlayerController playerCtrl;
+    [Inject] protected PlayerInputActions      inputActions;
     #endregion
 
     #region PROPERTIES
-    public bool IsDialoguePlaying { get; private set; }
-    private int CurrentChoiceIndex { get => currentChoiceIndex;
-                                     set {
-                                       currentChoiceIndex = value;
-                                       if (inkStory && inkStory.currentChoices.Count > 0)
-                                       {
-                                         currentChoiceIndex = value < 0
-                                                              ? inkStory.currentChoices.Count - 1
-                                                              : value % inkStory.currentChoices.Count;
+    public bool IsDialoguePlaying { get; protected set; }
+    protected int CurrentChoiceIndex { get => currentChoiceIndex;
+                                       set {
+                                         currentChoiceIndex = value;
+                                         if (inkStory && inkStory.currentChoices.Count > 0)
+                                         {
+                                           currentChoiceIndex = value < 0
+                                                                ? inkStory.currentChoices.Count - 1
+                                                                : value % inkStory.currentChoices.Count;
+                                         }
                                        }
                                      }
-                                   }
     #endregion
 
-    private void Awake()
+    public DialogueManager()
     {
-      if (Instance != null && Instance != this)
-      {
-        Destroy(this);
-        return;
-      }
-
-      Instance     = this;
-      participants = new Dictionary<string, DialogueParticipant>();
+      participants   = new Dictionary<string, DialogueParticipant>();
+      Parser         = new DialogueParser(this);
     }
 
-    private void Start()
+    #region IInitializable
+    public void Initialize()
     {
+      // т.к. DialogueAction использует Inject, то приходится создавать объект через DiContainer
+      dialogueAction = DiContainerRef.Container.Instantiate<DialogueAction>(new object[] { this });
+
+      inputActions.Player.Movement.performed += ShowNextDialogueChoice;
+
       ResetParameters();
     }
+    #endregion
 
-    private void ResetParameters()
+    #region IDisposable
+    public void Dispose()
     {
-      currentParticipantName = null;
-      CurrentChoiceIndex     = 0;
-      isChoiceIndexSelected  = false;
-      isChoosingChoie        = false;
-      IsDialoguePlaying      = false;
-      inkStory               = null;
-      updateInkStateCallback = null;
+      inputActions.Player.Movement.performed -= ShowNextDialogueChoice;
     }
+    #endregion
 
     #region PARTICIPANT MODIFICATION METHODS
     public void AddDialogueParticipant(DialogueParticipant _participant)
@@ -83,14 +85,21 @@ namespace TheLonelyOne.Dialogue
     }
     #endregion
 
-    #region DIALOGUE CONTROL
+    #region INPUT ACTIONS CALLBACKS
+    protected void ShowNextDialogueChoice(CallbackContext _context)
+    {
+      if (IsDialoguePlaying && isChoosingChoie && inkStory.currentChoices.Count > 0)
+        ShowDialogueChoice(CurrentChoiceIndex + (int)_context.ReadValue<Vector2>().x);
+    }
+    #endregion
+
+    #region INTREFACE
     public void StartDialogue(TextAsset _inkAsset, string _inkState, Action<string> _updateInkStateCallback)
     {
       inkStory               = new Story(_inkAsset.text);
       IsDialoguePlaying      = true;
       updateInkStateCallback = _updateInkStateCallback;
-
-      GameEvents.Instance.AllowPlayerToMove(false);
+      playerCtrl.CanMove     = false;
 
       SetStoryState(inkStory, _inkState);
       Parser.ParseTags(inkStory.globalTags);
@@ -114,7 +123,7 @@ namespace TheLonelyOne.Dialogue
                                  out string functionName,
                                  out string[] functionParams))
         {
-          DialogueAction.Invoke(functionName, functionParams);
+          dialogueAction.Invoke(functionName, functionParams);
           ContinueDialogue();
           return;
         }
@@ -144,11 +153,24 @@ namespace TheLonelyOne.Dialogue
     public void EndDialogue()
     {
       updateInkStateCallback(inkStory.state.ToJson());
-      GameEvents.Instance.AllowPlayerToMove(true);
+      playerCtrl.CanMove = true;
       ResetParameters();
     }
+    #endregion
 
-    private void SetStoryState(Story _inkStory, string _inkState)
+    #region METHODS
+    protected void ResetParameters()
+    {
+      currentParticipantName = null;
+      CurrentChoiceIndex     = 0;
+      isChoiceIndexSelected  = false;
+      isChoosingChoie        = false;
+      IsDialoguePlaying      = false;
+      inkStory               = null;
+      updateInkStateCallback = null;
+    }
+
+    protected void SetStoryState(Story _inkStory, string _inkState)
     {
       if (!string.IsNullOrEmpty(_inkState))
         _inkStory.state.LoadJson(_inkState);
@@ -156,20 +178,14 @@ namespace TheLonelyOne.Dialogue
       _inkStory.ChoosePathString("EntryPoint");
     }
 
-    private void DrawSpeechBubble(DialogueParticipant _dialogueParticipant, string _text, bool _hasChoice = false)
+    protected void DrawSpeechBubble(DialogueParticipant _dialogueParticipant, string _text, bool _hasChoice = false)
     {
       _dialogueParticipant.SetSpeechBubbleVisibility(true, _hasChoice);
       _dialogueParticipant.SetSpeechBubblePosition();
       _dialogueParticipant.SpeechBubbleText = _text;
     }
 
-    internal void ShowNextDialogueChoice(CallbackContext _context)
-    {
-      if (IsDialoguePlaying && isChoosingChoie && inkStory.currentChoices.Count > 0)
-        ShowDialogueChoice(CurrentChoiceIndex + (int)_context.ReadValue<Vector2>().x);
-    }
-
-    private void ShowDialogueChoice(int _choiceIndex)
+    protected void ShowDialogueChoice(int _choiceIndex)
     {
       CurrentChoiceIndex    = _choiceIndex;
       isChoiceIndexSelected = true;
@@ -178,7 +194,7 @@ namespace TheLonelyOne.Dialogue
       DrawSpeechBubble(participants[currentParticipantName], inkStory.currentChoices[CurrentChoiceIndex].text, true);
     }
 
-    private void ChooseChoiceIndex(int _index)
+    protected void ChooseChoiceIndex(int _index)
     {
       CurrentChoiceIndex    = 0;
       isChoiceIndexSelected = false;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TheLonelyOne.Dialogue;
 using TMPro;
+using Zenject;
 
 namespace TheLonelyOne
 {
@@ -22,6 +23,8 @@ namespace TheLonelyOne
     [Header("Speech bubble")]
     [SerializeField] protected Vector2 speechBubbleOffset;
 
+    [Inject] protected DialogueManager dialogueManager;
+
     protected GameObject       speechBubbleCanvas;
     protected GameObject       speechBubble;
     protected TextMeshProUGUI  speechBubbleText;
@@ -41,10 +44,10 @@ namespace TheLonelyOne
     #region IInteractable
     public virtual void Interact()
     {
-      if (!DialogueManager.Instance.IsDialoguePlaying)
-        DialogueManager.Instance.StartDialogue(inkAsset, inkState, UpdateInkState);
+      if (!dialogueManager.IsDialoguePlaying)
+        dialogueManager.StartDialogue(inkAsset, inkState, UpdateInkState);
       else
-        DialogueManager.Instance.ContinueDialogue();
+        dialogueManager.ContinueDialogue();
     }
 
     public void Save(ref GameData _gameData)
@@ -73,12 +76,12 @@ namespace TheLonelyOne
     protected void Start()
     {
       SetSpeechBubbleVisibility(false);
-      DialogueManager.Instance.AddDialogueParticipant(this);
+      dialogueManager.AddDialogueParticipant(this);
     }
 
     protected void OnDestroy()
     {
-      DialogueManager.Instance.RemoveDialogueParticipant(Name);
+      dialogueManager.RemoveDialogueParticipant(Name);
     }
 
     public void SetSpeechBubbleVisibility(bool _isBubbleVisible, bool _isArrowVisible = false)

@@ -21,6 +21,10 @@ namespace TheLonelyOne.UI
     public bool IsCombinationValid { get; private set; }
     #endregion
 
+    #region EVENTS
+    public event Action<string> OnPuzzleCompleted;
+    #endregion
+
     [ContextMenu("Generate guid fo id")]
     protected void GenerateGuid() => id = Utils.GenerateGuid();
 
@@ -40,6 +44,7 @@ namespace TheLonelyOne.UI
     }
     #endregion
 
+    #region LIFECYCLE
     protected void Awake()
     {
       bool firstInitialization = string.IsNullOrEmpty(currentCombination);
@@ -64,7 +69,9 @@ namespace TheLonelyOne.UI
         if (element != null)
           element.OnSymbolChange -= ValidateCombination;
     }
+    #endregion
 
+    #region INTERFACE
     public void ValidateCombination()
     {
       if (lockElements.Count != rightCombination.Length)
@@ -85,7 +92,8 @@ namespace TheLonelyOne.UI
       }
 
       if (IsCombinationValid)
-        GameEvents.Instance.CompletePuzzle(id);
+        OnPuzzleCompleted?.Invoke(id);
     }
+    #endregion
   }
 }
