@@ -20,12 +20,12 @@ namespace TheLonelyOne.Player
     protected bool isMoving;
     protected int  direction;
 
-    [Inject] protected PlayerController   playerCtrl;
     [Inject] protected PlayerInputActions inputActions;
     #endregion
 
     #region PROPERTIES
     public MovementParameters Parameters { get; set; }
+    public bool               CanMove { get; set; } = true;
     public bool               IsWalking { get; protected set; }
     public bool               IsRunnnig { get; protected set; }
     public float CurrentVelocity { get => rigidbody2d.velocity.x; }
@@ -74,7 +74,7 @@ namespace TheLonelyOne.Player
 
     protected virtual void FixedUpdate()
     {
-      if (!playerCtrl.CanMove)
+      if (!CanMove)
         return;
 
       isMoving = false;

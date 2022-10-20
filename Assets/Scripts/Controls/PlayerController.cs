@@ -16,7 +16,9 @@ namespace TheLonelyOne.Player
     #endregion
 
     #region PROPERTIES
-    public bool CanMove { get; set; } = true;
+    public bool CanMove { get => movementCtrl.CanMove;
+                          set => movementCtrl.CanMove = value;
+                        }
     #endregion
 
     #region EVENTS
