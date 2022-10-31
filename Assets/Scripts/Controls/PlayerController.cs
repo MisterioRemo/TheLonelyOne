@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using Zenject;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
@@ -16,13 +17,17 @@ namespace TheLonelyOne.Player
     #endregion
 
     #region PROPERTIES
-    public bool CanMove { get => movementCtrl.CanMove;
-                          set => movementCtrl.CanMove = value;
-                        }
+    public bool              CanMove                  { get => movementCtrl.CanMove;
+                                                        set => movementCtrl.CanMove = value;
+                                                      }
+    public MovementDirection BlockMovementInDirection { get => movementCtrl.BlockedDirection;
+                                                        set => movementCtrl.BlockedDirection = value;
+                                                      }
     #endregion
 
     #region EVENTS
     public event Action<Vector3> OnTeleporting;
+    public event Action          OnTeleportingEnd;
     #endregion
 
     #region LIFECYCLE
@@ -89,11 +94,37 @@ namespace TheLonelyOne.Player
     }
     #endregion
 
-    #region INTERFACE
-    public void Teleport(Vector3 _position)
+    #region METHODS
+    protected IEnumerator TeleportEnd(float _duration)
     {
-      transform.position = _position;
+      yield return new WaitForSeconds(_duration);
+      OnTeleportingEnd?.Invoke();
+    }
+    #endregion
+
+    #region INTERFACE
+    public void Teleport(Vector3 _position, float _duration = 0.0f)
+    {
+      transform.position            = _position;
+      movementCtrl.BlockedDirection = MovementDirection.None;
       OnTeleporting?.Invoke(_position);
+      StartCoroutine(TeleportEnd(_duration));
+    }
+
+    public void DetectNearestInteractableObject()
+    {
+      RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 1.5f, Vector2.zero);
+
+      foreach(var hit in hits)
+      {
+        if (!hit.collider.CompareTag("Player")
+            && hit.collider.GetComponentInChildren<IInteractable>() is IInteractable interactable)
+        {
+          interactableObject = interactable;
+          interactableObject.PreInteract();
+          break;
+        }
+      }
     }
 
     public void ChangeInputActionsMap(InputActionsMap _map)

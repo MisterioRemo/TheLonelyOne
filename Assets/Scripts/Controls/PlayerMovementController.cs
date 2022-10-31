@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using Zenject;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
@@ -16,6 +16,7 @@ namespace TheLonelyOne.Player
     protected Rigidbody2D rigidbody2d;
     protected Vector2     inputVetor;
 
+    protected bool canMove = true;
     protected bool wasMoving;
     protected bool isMoving;
     protected int  direction;
@@ -24,22 +25,30 @@ namespace TheLonelyOne.Player
     #endregion
 
     #region PROPERTIES
-    public MovementParameters Parameters { get; set; }
-    public bool               CanMove { get; set; } = true;
-    public bool               IsWalking { get; protected set; }
-    public bool               IsRunnnig { get; protected set; }
-    public float CurrentVelocity { get => rigidbody2d.velocity.x; }
-    public float CurrentSpeed { get => Mathf.Abs(CurrentVelocity); }
-    public int   Direction { get => direction;
-                             protected set
-                             {
-                               if (direction != value)
-                               {
-                                 direction = value;
-                                 OnDirectionChange?.Invoke(direction);
-                               }
-                             }
-                           }
+    public MovementParameters Parameters       { get; set; }
+    public MovementDirection  BlockedDirection { get; set; } = MovementDirection.None;
+    public bool               CanMove          { get => canMove;
+                                                 set
+                                                 {
+                                                   canMove = value;
+                                                   if (!canMove)
+                                                     isMoving = false;
+                                                 }
+                                               }
+    public bool               IsWalking        { get; protected set; }
+    public bool               IsRunnnig        { get; protected set; }
+    public float              CurrentVelocity  { get => rigidbody2d.velocity.x; }
+    public float              CurrentSpeed     { get => Mathf.Abs(CurrentVelocity); }
+    public int                Direction        { get => direction;
+                                                 protected set
+                                                 {
+                                                   if (direction != value && value != 0)
+                                                   {
+                                                     direction = value;
+                                                     OnDirectionChange?.Invoke(direction);
+                                                   }
+                                                 }
+                                               }
     #endregion
 
     #region EVENTS
@@ -69,7 +78,10 @@ namespace TheLonelyOne.Player
       }
 
       if (isMoving)
+      {
         OnSpeedChange?.Invoke(CurrentSpeed);
+        UnblockMovementInDirection();
+      }
     }
 
     protected virtual void FixedUpdate()
@@ -109,25 +121,46 @@ namespace TheLonelyOne.Player
     #region METHODS
     protected virtual void Move(float _lerpValue)
     {
-      float targetSpeed = inputVetor.x * Parameters.walkingSpeed;
+      float targetSpeed = GetXDirection() * Parameters.walkingSpeed;
       float deltaSpeed  = targetSpeed - rigidbody2d.velocity.x;
       float accelRate   = (Mathf.Abs(targetSpeed) < float.Epsilon) ? Parameters.acceleration : Parameters.decceleration;
-      float movement    = Mathf.Pow(Mathf.Abs(deltaSpeed) * accelRate, Parameters.velocityPower) * Mathf.Sign(deltaSpeed);
+      float movement    = Mathf.Pow(Mathf.Abs(deltaSpeed) * accelRate, Parameters.velocityPower) * Utils.Sign(deltaSpeed);
 
       movement = Mathf.Lerp(rigidbody2d.velocity.x, movement, _lerpValue);
       rigidbody2d.AddForce(movement * Vector2.right);
 
-      Direction = (int)Mathf.Sign(rigidbody2d.velocity.x);
+      Direction = Utils.Sign(rigidbody2d.velocity.x);
       isMoving  = true;
     }
 
     protected virtual void Drag(float _amount)
     {
       float force = Mathf.Abs(rigidbody2d.velocity.x) * _amount;
-      force *= -Mathf.Sign(rigidbody2d.velocity.x);
+      force       *= -Utils.Sign(rigidbody2d.velocity.x);
 
       rigidbody2d.AddForce(force * Vector2.right, ForceMode2D.Impulse);
       isMoving = true;
+    }
+
+    protected float GetXDirection()
+    {
+      if ((BlockedDirection == MovementDirection.Left && inputVetor.x < 0)
+          || (BlockedDirection == MovementDirection.Right && inputVetor.x > 0)
+          || BlockedDirection == MovementDirection.Horizontal)
+      {
+        return 0.0f;
+      }
+
+      return inputVetor.x;
+    }
+
+    protected virtual void UnblockMovementInDirection()
+    {
+      if ((BlockedDirection == MovementDirection.Left && inputVetor.x > 0)
+          || (BlockedDirection == MovementDirection.Right && inputVetor.x < 0))
+      {
+        BlockedDirection = MovementDirection.None;
+      }
     }
     #endregion
   }

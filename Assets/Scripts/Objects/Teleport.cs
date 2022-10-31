@@ -51,7 +51,7 @@ namespace TheLonelyOne
 
       if (destination != null)
       {
-        playerCtrl.Teleport(destination.position);
+        playerCtrl.Teleport(destination.position, transitionDuration);
         yield return new WaitForSeconds(transitionDuration);
       }
 
@@ -60,6 +60,7 @@ namespace TheLonelyOne
 
       transitionUI.SetActive(false);
       playerCtrl.CanMove = true;
+      playerCtrl.DetectNearestInteractableObject();
     }
   }
 }

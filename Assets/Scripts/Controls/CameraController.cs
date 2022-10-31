@@ -17,9 +17,9 @@ namespace TheLonelyOne
     [SerializeField] protected Vector2     offset;
 
     protected BoxCollider2D     boxCollider;
-    protected float             horizontalDirection;
     protected Vector3           fixedPosition;
     protected UnfixingCondition unfixingCondition;
+    protected MovementDirection allowedDirection;
     #endregion
 
     #region PROPERTIES
@@ -27,7 +27,6 @@ namespace TheLonelyOne
     /// Only horizontal fix.
     /// </summary>
     public bool          IsPositionFixed { get; set; }
-    public BoxCollider2D Collider { get => boxCollider; }
     #endregion
 
     #region LIFECYCLE
@@ -37,7 +36,10 @@ namespace TheLonelyOne
       boxCollider.size = CalculateColliderSize(GetComponent<Camera>());
 
       if (target && target.GetComponent<Player.PlayerController>() is Player.PlayerController playerCtrl)
-        playerCtrl.OnTeleporting += Teleport;
+      {
+        playerCtrl.OnTeleporting    += Teleport;
+        playerCtrl.OnTeleportingEnd += SwitchEnabled;
+      }
     }
 
     protected void LateUpdate()
@@ -45,10 +47,9 @@ namespace TheLonelyOne
       if (IsPositionFixed && IsUnfixedConditionFulfilled())
         IsPositionFixed = false;
 
-      horizontalDirection = target.position.x - transform.position.x;
       Vector3 newPosition = CalculateCameraPosition(target.position);
       transform.position  = IsPositionFixed
-                            ? new Vector3(fixedPosition.x, newPosition.y, newPosition.y)
+                            ? newPosition
                             : Vector3.Lerp(transform.position,
                                            newPosition,
                                            interpolationSpeed * Time.deltaTime);
@@ -57,16 +58,22 @@ namespace TheLonelyOne
     protected void OnDestroy()
     {
       if (target && target.GetComponent<Player.PlayerController>() is Player.PlayerController playerCtrl)
-        playerCtrl.OnTeleporting -= Teleport;
+      {
+        playerCtrl.OnTeleporting    -= Teleport;
+        playerCtrl.OnTeleportingEnd -= SwitchEnabled;
+      }
     }
     #endregion
 
     #region METHODS
     protected Vector3 CalculateCameraPosition(Vector3 _targetPosition)
     {
-      return new Vector3(_targetPosition.x + offset.x,
-                         _targetPosition.y + offset.y,
-                         transform.position.z);
+      if (!IsPositionFixed)
+        return new Vector3(_targetPosition.x + offset.x, _targetPosition.y + offset.y, transform.position.z);
+      else if (unfixingCondition == UnfixingCondition.StayFixed)
+        return new Vector3(fixedPosition.x, fixedPosition.y, transform.position.z);
+      else
+        return new Vector3(fixedPosition.x, _targetPosition.y + offset.y, transform.position.z);
     }
 
     protected Vector2 CalculateColliderSize(Camera _camera)
@@ -83,9 +90,11 @@ namespace TheLonelyOne
       switch (unfixingCondition)
       {
         case UnfixingCondition.DirectionChange:
-          return horizontalDirection * (target.position.x - transform.position.x) < 0;
+          return Utils.GetMovementDirection((int)(target.position.x - transform.position.x)) == allowedDirection;
 
         case UnfixingCondition.StayFixed:
+          return false;
+
         default:
           return true;
       }
@@ -93,8 +102,15 @@ namespace TheLonelyOne
 
     protected void Teleport(Vector3 _position)
     {
-      InstantCameraMove(_position);
+      SwitchEnabled();
       IsPositionFixed = false;
+      InstantCameraMove(_position);
+    }
+
+    protected void SwitchEnabled()
+    {
+      boxCollider.enabled = !boxCollider.enabled;
+      enabled             = !enabled;
     }
     #endregion
 
@@ -108,11 +124,13 @@ namespace TheLonelyOne
     /// 
     /// </summary>
     /// <param name="_fixedPosition"> position in world space</param>
+    /// <param name="_blockedDirection">
     /// <param name="_condition"></param>
-    public void FixCameraPosition(Vector3 _fixedPosition, UnfixingCondition _condition)
+    public void FixCameraPosition(Vector3 _fixedPosition, MovementDirection _blockedDirection, UnfixingCondition _condition)
     {
       IsPositionFixed   = true;
       fixedPosition     = _fixedPosition;
+      allowedDirection  = Utils.GetOppositeDirection(_blockedDirection);
       unfixingCondition = _condition;
     }
     #endregion

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace TheLonelyOne
@@ -16,7 +15,7 @@ namespace TheLonelyOne
 
     #region PROPERTIES
     public bool IconVisability { get => icon ? icon.activeSelf : false;
-                                 private set
+                                 set
                                  {
                                    if (icon)
                                      icon.SetActive(value);
@@ -28,9 +27,19 @@ namespace TheLonelyOne
     protected void GenerateGuid() => id = Utils.GenerateGuid();
 
     #region IInteractable
+    public virtual void PreInteract()
+    {
+      IconVisability = true;
+    }
+
     public virtual void Interact()
     {
       // Empty
+    }
+
+    public virtual void PostInteract()
+    {
+      IconVisability = false;
     }
     #endregion
 
@@ -97,22 +106,25 @@ namespace TheLonelyOne
     }
     #endregion
 
+    #region LIFECYCLE
     protected virtual void Awake()
     {
       icon = transform.Find("Icon").gameObject;
     }
+    #endregion
 
+    #region COLLISIONS
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
       if (_collision.CompareTag("Player"))
-        IconVisability = true;
+        PreInteract();
     }
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
       if (_collision.CompareTag("Player"))
-        IconVisability = false;
+        PostInteract();
     }
-
+    #endregion
   }
 }

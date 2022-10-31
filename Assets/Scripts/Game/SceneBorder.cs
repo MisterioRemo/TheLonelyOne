@@ -5,18 +5,12 @@ namespace TheLonelyOne
   [RequireComponent(typeof(BoxCollider2D))]
   public class SceneBorder : MonoBehaviour
   {
-    public enum BlockedSide : byte
-    {
-      Both,
-      Right,
-      Left,
-      None
-    }
-
     #region PARAMETERS
-    [SerializeField] protected BlockedSide blockedSide;
-    [SerializeField] protected bool        doesAffectPlayer;
-    [SerializeField] protected bool        doesAffectCamera;
+    [SerializeField] protected MovementDirection blockedSide;
+    [SerializeField] protected bool              doesAffectPlayer;
+    [SerializeField] protected bool              doesAffectCamera;
+    [SerializeField] protected bool              setCameraPositionManually;
+    [SerializeField] protected Vector3           cameraPosition;
 
     BoxCollider2D boxCollider;
     #endregion
@@ -39,21 +33,51 @@ namespace TheLonelyOne
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
       if (DoesAffectPlayer // && _collision.gameObject.tag == "Player"
-        && blockedSide != BlockedSide.None
+        && blockedSide != MovementDirection.None
         && _collision.GetComponent<Player.PlayerController>() is Player.PlayerController _playerController)
       {
-        // stop player movement
+        _playerController.BlockMovementInDirection = GetTargetBlockedDirection(_collision, boxCollider, blockedSide);
       }
 
       if (doesAffectCamera // && _collision.CompareTag("MainCamera")
-          && blockedSide != BlockedSide.None
+          && blockedSide != MovementDirection.None
           && _collision.GetComponent<CameraController>() is CameraController _cameraController)
       {
-        _cameraController.FixCameraPosition(new Vector3(CalculateExtremePosition(_cameraController.Collider, boxCollider, blockedSide),
-                                                        _cameraController.transform.position.y,
-                                                        _cameraController.transform.position.z),
-                                            CameraController.UnfixingCondition.DirectionChange);
+        if (setCameraPositionManually)
+          _cameraController.FixCameraPosition(cameraPosition,
+                                              GetTargetBlockedDirection(_collision, boxCollider, blockedSide),
+                                              CameraController.UnfixingCondition.StayFixed);
+        else
+          _cameraController.FixCameraPosition(new Vector3(CalculateExtremeXPosition((BoxCollider2D)_collision, boxCollider, blockedSide),
+                                                          _cameraController.transform.position.y,
+                                                          _cameraController.transform.position.z),
+                                              GetTargetBlockedDirection(_collision, boxCollider, blockedSide),
+                                              CameraController.UnfixingCondition.DirectionChange);
       }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_targetCollider"></param>
+    /// <param name="_borderCollider"></param>
+    /// <param name="_blockedSide"></param>
+    /// <returns>Returns 1 if right movement should be blocked, -1 if left, 0 otherwise.</returns>
+    protected int GetBlockedMovementSign(Collider2D _targetCollider, Collider2D _borderCollider, MovementDirection _blockedSide)
+    {
+      bool targetOnLeftSide = _targetCollider.Distance(_borderCollider).normal.x > 0;
+
+      if (targetOnLeftSide && (_blockedSide == MovementDirection.Left || _blockedSide == MovementDirection.Horizontal))
+        return 1;
+      else if (!targetOnLeftSide && (_blockedSide == MovementDirection.Right || _blockedSide == MovementDirection.Horizontal))
+        return -1;
+      else
+        return 0;
+    }
+
+    protected MovementDirection GetTargetBlockedDirection(Collider2D _targetCollider, Collider2D _borderCollider, MovementDirection _blockedSide)
+    {
+      return Utils.GetMovementDirection(GetBlockedMovementSign(_targetCollider, _borderCollider, _blockedSide));
     }
 
     /// <summary>
@@ -63,18 +87,12 @@ namespace TheLonelyOne
     /// <param name="_borderCollider"></param>
     /// <param name="_blockedSide"></param>
     /// <returns></returns>
-    protected float CalculateExtremePosition(BoxCollider2D _targetCollider, BoxCollider2D _borderCollider, BlockedSide _blockedSide)
+    protected float CalculateExtremeXPosition(BoxCollider2D _targetCollider, BoxCollider2D _borderCollider, MovementDirection _blockedSide)
     {
-      bool targetOnLeftSide = _targetCollider.Distance(_borderCollider).normal.x > 0;
-      int  sign             = 0;
+      int sign = GetBlockedMovementSign(_targetCollider, _borderCollider, _blockedSide);
 
-      if (targetOnLeftSide && (_blockedSide == BlockedSide.Left || _blockedSide == BlockedSide.Both))
-        sign = -1;
-      else if (!targetOnLeftSide && (_blockedSide == BlockedSide.Right || _blockedSide == BlockedSide.Both))
-        sign = 1;
-      
       return transform.TransformPoint(_borderCollider.bounds.center).x
-             + sign * (_borderCollider.size.x + _targetCollider.size.x) / 2.0f;
+             - sign * (_borderCollider.size.x + _targetCollider.size.x) / 2.0f;
     }
   }
 }

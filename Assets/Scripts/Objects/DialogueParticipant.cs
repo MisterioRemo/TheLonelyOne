@@ -42,6 +42,11 @@ namespace TheLonelyOne
     protected void GenerateGuid() => id = Utils.GenerateGuid();
 
     #region IInteractable
+    public virtual void PreInteract()
+    {
+      // Empty
+    }
+
     public virtual void Interact()
     {
       if (!dialogueManager.IsDialoguePlaying)
@@ -50,19 +55,27 @@ namespace TheLonelyOne
         dialogueManager.ContinueDialogue();
     }
 
-    public void Save(ref GameData _gameData)
+    public virtual void PostInteract()
+    {
+      // Empty
+    }
+    #endregion
+
+    #region IDataPersistence
+    public virtual void Save(ref GameData _gameData)
     {
       if (!string.IsNullOrEmpty(inkState))
         _gameData.DialogueAssetStates[id] = inkState;
     }
 
-    public void Load(GameData _gameData)
+    public virtual void Load(GameData _gameData)
     {
       _gameData.DialogueAssetStates.TryGetValue(id, out inkState);
     }
     #endregion
 
-    protected void Awake()
+    #region LIFECYCLE
+    protected virtual void Awake()
     {
       speechBubbleCanvas = gameObject.transform.Find("DialogueContainer").gameObject;
       speechBubble       = speechBubbleCanvas.transform.Find("DialogueBubble").gameObject;
@@ -73,17 +86,19 @@ namespace TheLonelyOne
       };
     }
 
-    protected void Start()
+    protected virtual void Start()
     {
       SetSpeechBubbleVisibility(false);
       dialogueManager.AddDialogueParticipant(this);
     }
 
-    protected void OnDestroy()
+    protected virtual void OnDestroy()
     {
       dialogueManager.RemoveDialogueParticipant(Name);
     }
+    #endregion
 
+    #region INTERFACE
     public void SetSpeechBubbleVisibility(bool _isBubbleVisible, bool _isArrowVisible = false)
     {
       SetSpeechBubbleArrowVisibility(_isArrowVisible);
@@ -111,5 +126,6 @@ namespace TheLonelyOne
     {
       inkState = _savedJson;
     }
+    #endregion
   }
 }
