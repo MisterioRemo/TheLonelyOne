@@ -9,7 +9,11 @@ namespace TheLonelyOne
     [SerializeField] protected MovementDirection blockedSide;
     [SerializeField] protected bool              doesAffectPlayer;
     [SerializeField] protected bool              doesAffectCamera;
+
+    [ShowIf(ActionOnConditionFail.DontDraw, ConditionOperator.And, nameof(doesAffectCamera))]
     [SerializeField] protected bool              setCameraPositionManually;
+
+    [ShowIf(ActionOnConditionFail.DontDraw, ConditionOperator.And, nameof(setCameraPositionManually))]
     [SerializeField] protected Vector3           cameraPosition;
 
     BoxCollider2D boxCollider;
