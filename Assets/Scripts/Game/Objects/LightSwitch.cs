@@ -24,7 +24,7 @@ namespace TheLonelyOne
     private SpriteRenderer                  spriteRenderer;
     private Dictionary<SwitchState, Sprite> states;
 
-    [SerializeField] private List<Light2D>         lights;
+    [SerializeField] private List<GameObject>      lightGameObjects;
     [SerializeField] private List<SwitchStatePair> switchStates;
     #endregion
 
@@ -73,6 +73,12 @@ namespace TheLonelyOne
 
       foreach (var pair in switchStates)
         states.Add(pair.state, pair.sprite);
+
+      foreach (var obj in lightGameObjects)
+      {
+        if (obj.GetComponentInChildren<Light2D>() == null)
+          Debug.LogError($"'{obj.name}' does not have Light2D component.");
+      }
     }
 
     protected void Start()
@@ -89,8 +95,12 @@ namespace TheLonelyOne
 
     protected void SwitchLights(SwitchState _state)
     {
-      foreach (var light in lights)
-        light.enabled = Convert.ToBoolean(_state);
+      foreach (var obj in lightGameObjects)
+      {
+        obj.GetComponentInChildren<Light2D>().enabled = Convert.ToBoolean(_state);
+        if (obj.GetComponent<SpriteRenderer>() is SpriteRenderer renderer)
+          renderer.material.SetFloat("_EmissionKoef", Convert.ToSingle(_state));
+      }
     }
   }
 }

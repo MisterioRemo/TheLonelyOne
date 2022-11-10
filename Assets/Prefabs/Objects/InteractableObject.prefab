@@ -265,4 +265,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bcd584f575f5414abfc0bc65fd46d6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  icon: {fileID: 872271250461804568}
+  id: 
+  childObjectToSave: []
