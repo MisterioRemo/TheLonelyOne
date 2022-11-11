@@ -23,11 +23,19 @@ namespace TheLonelyOne.Player
     public MovementDirection BlockMovementInDirection { get => movementCtrl.BlockedDirection;
                                                         set => movementCtrl.BlockedDirection = value;
                                                       }
+    public IInteractable     InteractableObject       { get => interactableObject;
+                                                        private set {
+                                                          interactableObject = value;
+                                                          if (interactableObject != null)
+                                                            OnInteractableSet?.Invoke(interactableObject);
+                                                        }
+                                                      }
     #endregion
 
     #region EVENTS
-    public event Action<Vector3> OnTeleporting;
-    public event Action          OnTeleportingEnd;
+    public event Action<Vector3>       OnTeleporting;
+    public event Action                OnTeleportingEnd;
+    public event Action<IInteractable> OnInteractableSet;
     #endregion
 
     #region LIFECYCLE
@@ -84,13 +92,13 @@ namespace TheLonelyOne.Player
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
       if (_collision.GetComponentInChildren<IInteractable>() is IInteractable interactable)
-        interactableObject = interactable;
+        InteractableObject = interactable;
     }
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
       if (interactableObject == _collision.GetComponent<IInteractable>())
-        interactableObject = null;
+        InteractableObject = null;
     }
     #endregion
 
@@ -120,8 +128,7 @@ namespace TheLonelyOne.Player
         if (!hit.collider.CompareTag("Player")
             && hit.collider.GetComponentInChildren<IInteractable>() is IInteractable interactable)
         {
-          interactableObject = interactable;
-          interactableObject.PreInteract();
+          InteractableObject = interactable;
           break;
         }
       }

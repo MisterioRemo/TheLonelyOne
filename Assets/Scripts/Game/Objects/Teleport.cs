@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Zenject;
 
 namespace TheLonelyOne
 {
@@ -14,8 +13,6 @@ namespace TheLonelyOne
     [SerializeField] protected float      transitionStartDuration = 1.0f;
     [SerializeField] protected float      transitionDuration = 0.5f;
     [SerializeField] protected float      transitionEndDuration   = 1.0f;
-
-    [Inject] protected Player.PlayerController playerCtrl;
     #endregion
 
     #region INTERACTABLE OBJECT

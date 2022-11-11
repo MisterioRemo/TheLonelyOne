@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace TheLonelyOne
 {
   public class InteractableObject : MonoBehaviour, IInteractable
   {
     #region PARAMETERS
-    protected GameObject icon;
+    private GameObject icon;
+
+    [Inject] protected Player.PlayerController playerCtrl;
 
     [Header("Data Persistence")]
     [SerializeField] protected string           id;
@@ -26,20 +29,10 @@ namespace TheLonelyOne
     [ContextMenu("Generate guid fo id")]
     protected void GenerateGuid() => id = Utils.GenerateGuid();
 
-    #region IInteractable
-    public virtual void PreInteract()
-    {
-      IconVisability = true;
-    }
-
+    #region IINTERACTABLE
     public virtual void Interact()
     {
       // Empty
-    }
-
-    public virtual void PostInteract()
-    {
-      IconVisability = false;
     }
     #endregion
 
@@ -111,19 +104,37 @@ namespace TheLonelyOne
     {
       icon = transform.Find("Icon").gameObject;
     }
+
+    protected virtual void OnDestroy()
+    {
+      playerCtrl.OnInteractableSet -= InteractableSetCallback;
+    }
     #endregion
 
     #region COLLISIONS
-    protected void OnTriggerEnter2D(Collider2D _collision)
+    protected virtual void OnTriggerEnter2D(Collider2D _collision)
     {
       if (_collision.CompareTag("Player"))
-        PreInteract();
+      {
+        IconVisability                = true;
+        playerCtrl.OnInteractableSet += InteractableSetCallback;
+      }
     }
 
-    protected void OnTriggerExit2D(Collider2D _collision)
+    protected virtual void OnTriggerExit2D(Collider2D _collision)
     {
       if (_collision.CompareTag("Player"))
-        PostInteract();
+      {
+        IconVisability                = false;
+        playerCtrl.OnInteractableSet -= InteractableSetCallback;
+      }
+    }
+    #endregion
+
+    #region METHODS
+    private void InteractableSetCallback(IInteractable _interactable)
+    {
+      IconVisability = (IInteractable)this == _interactable;
     }
     #endregion
   }

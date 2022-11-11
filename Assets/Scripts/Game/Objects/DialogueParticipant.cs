@@ -42,22 +42,12 @@ namespace TheLonelyOne
     protected void GenerateGuid() => id = Utils.GenerateGuid();
 
     #region IInteractable
-    public virtual void PreInteract()
-    {
-      // Empty
-    }
-
     public virtual void Interact()
     {
       if (!dialogueManager.IsDialoguePlaying)
         dialogueManager.StartDialogue(inkAsset, inkState, UpdateInkState);
       else
         dialogueManager.ContinueDialogue();
-    }
-
-    public virtual void PostInteract()
-    {
-      // Empty
     }
     #endregion
 
