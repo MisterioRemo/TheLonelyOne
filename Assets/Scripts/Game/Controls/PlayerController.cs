@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
@@ -9,8 +11,9 @@ namespace TheLonelyOne.Player
   public class PlayerController : MonoBehaviour, ICharacter
   {
     #region PARAMETERS
-    protected Animator      animator;
-    protected IInteractable interactableObject;
+    protected Animator               animator;
+    private   IInteractable          interactableObject;
+    private   HashSet<IInteractable> interactableObjectsInArea;
 
     [Inject] protected PlayerInputActions       inputActions;
     [Inject] protected PlayerMovementController movementCtrl;
@@ -41,7 +44,8 @@ namespace TheLonelyOne.Player
     #region LIFECYCLE
     protected virtual void Awake()
     {
-      animator = GetComponent<Animator>();
+      animator                  = GetComponent<Animator>();
+      interactableObjectsInArea = new HashSet<IInteractable>();
     }
 
     protected virtual void Start()
@@ -92,13 +96,21 @@ namespace TheLonelyOne.Player
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
       if (_collision.GetComponentInChildren<IInteractable>() is IInteractable interactable)
+      {
         InteractableObject = interactable;
+        interactableObjectsInArea.Add(interactable);
+      }
     }
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
       if (interactableObject == _collision.GetComponent<IInteractable>())
+      {
+        interactableObjectsInArea.Remove(InteractableObject);
         InteractableObject = null;
+        if (interactableObjectsInArea.Count != 0)
+          InteractableObject = interactableObjectsInArea.First();
+      }
     }
     #endregion
 
@@ -115,20 +127,25 @@ namespace TheLonelyOne.Player
     {
       transform.position            = _position;
       movementCtrl.BlockedDirection = MovementDirection.None;
+
+      interactableObjectsInArea.Clear();
       OnTeleporting?.Invoke(_position);
       StartCoroutine(TeleportEnd(_duration));
     }
 
     public void DetectNearestInteractableObject()
     {
-      RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 1.5f, Vector2.zero);
-
-      foreach(var hit in hits)
+      BoxCollider2D playerCollider   = GetComponent<BoxCollider2D>();
+      Collider2D[]  overlapColliders = Physics2D.OverlapAreaAll(playerCollider.bounds.min,
+                                                                playerCollider.bounds.max,
+                                                                LayerMask.GetMask("Interactable"));
+      foreach (var collider in overlapColliders)
       {
-        if (!hit.collider.CompareTag("Player")
-            && hit.collider.GetComponentInChildren<IInteractable>() is IInteractable interactable)
+        if (!collider.CompareTag("Player")
+            && collider.GetComponentInChildren<IInteractable>() is IInteractable interactable)
         {
           InteractableObject = interactable;
+          interactableObjectsInArea.Add(interactable);
           break;
         }
       }

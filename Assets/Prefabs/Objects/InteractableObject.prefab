@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 5574993909535120564}
   - component: {fileID: 872271250604663290}
   - component: {fileID: 872271250604663291}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: InteractableObject
   m_TagString: Interactable
   m_Icon: {fileID: 0}

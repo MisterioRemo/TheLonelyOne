@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2838591107503347028}
   - component: {fileID: 7358889394483030042}
   - component: {fileID: 5683913006590829814}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpeakableObject
   m_TagString: Interactable
   m_Icon: {fileID: 0}
@@ -147,7 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b27e799b16ec74a459af14f8770c172e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  icon: {fileID: 7358889394760090104}
+  id: 
+  childObjectToSave: []
   dialogueParticipant: {fileID: 3489704227452969727}
 --- !u!1 &7358889394760090104
 GameObject:
