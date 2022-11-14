@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 
@@ -132,9 +133,9 @@ namespace TheLonelyOne
     #endregion
 
     #region METHODS
-    private void InteractableSetCallback(IInteractable _interactable)
+    private void InteractableSetCallback(IInteractable[] _interactable)
     {
-      IconVisability = (IInteractable)this == _interactable;
+      IconVisability = _interactable.Contains((IInteractable)this);
     }
     #endregion
   }

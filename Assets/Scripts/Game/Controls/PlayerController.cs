@@ -11,9 +11,9 @@ namespace TheLonelyOne.Player
   public class PlayerController : MonoBehaviour, ICharacter
   {
     #region PARAMETERS
-    protected Animator               animator;
-    private   IInteractable          interactableObject;
-    private   HashSet<IInteractable> interactableObjectsInArea;
+    protected Animator                 animator;
+    private   IInteractable[]          interactableObject;
+    private   HashSet<IInteractable[]> interactableObjectsInArea;
 
     [Inject] protected PlayerInputActions       inputActions;
     [Inject] protected PlayerMovementController movementCtrl;
@@ -26,7 +26,7 @@ namespace TheLonelyOne.Player
     public MovementDirection BlockMovementInDirection { get => movementCtrl.BlockedDirection;
                                                         set => movementCtrl.BlockedDirection = value;
                                                       }
-    public IInteractable     InteractableObject       { get => interactableObject;
+    public IInteractable[]   InteractableObject       { get => interactableObject;
                                                         private set {
                                                           interactableObject = value;
                                                           if (interactableObject != null)
@@ -36,16 +36,16 @@ namespace TheLonelyOne.Player
     #endregion
 
     #region EVENTS
-    public event Action<Vector3>       OnTeleporting;
-    public event Action                OnTeleportingEnd;
-    public event Action<IInteractable> OnInteractableSet;
+    public event Action<Vector3>         OnTeleporting;
+    public event Action                  OnTeleportingEnd;
+    public event Action<IInteractable[]> OnInteractableSet;
     #endregion
 
     #region LIFECYCLE
     protected virtual void Awake()
     {
       animator                  = GetComponent<Animator>();
-      interactableObjectsInArea = new HashSet<IInteractable>();
+      interactableObjectsInArea = new HashSet<IInteractable[]>();
     }
 
     protected virtual void Start()
@@ -55,6 +55,8 @@ namespace TheLonelyOne.Player
       movementCtrl.OnMovingStateChange += SetWalkingAnimation;
       movementCtrl.OnDirectionChange   += SetDirectionAnimation;
       movementCtrl.OnSpeedChange       += SetSpeedAnimation;
+
+      DetectNearestInteractableObject();
     }
 
     protected virtual void OnDestroy()
@@ -70,8 +72,11 @@ namespace TheLonelyOne.Player
     #region INPUT ACTIONS CALLBACKS
     protected void InteractionPressed(CallbackContext _context)
     {
-      if (interactableObject != null)
-        interactableObject.Interact();
+      if (interactableObject != null && interactableObject.Length != 0)
+      {
+        foreach (var obj in interactableObject)
+          obj.Interact();
+      }
     }
     #endregion
 
@@ -95,7 +100,7 @@ namespace TheLonelyOne.Player
     #region COLLISIONS
     protected void OnTriggerEnter2D(Collider2D _collision)
     {
-      if (_collision.GetComponentInChildren<IInteractable>() is IInteractable interactable)
+      if (TryGetInteractableComponents(_collision.gameObject, out IInteractable[] interactable))
       {
         InteractableObject = interactable;
         interactableObjectsInArea.Add(interactable);
@@ -104,7 +109,7 @@ namespace TheLonelyOne.Player
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
-      if (interactableObject == _collision.GetComponent<IInteractable>())
+      if (interactableObject.Contains(_collision.GetComponent<IInteractable>()))
       {
         interactableObjectsInArea.Remove(InteractableObject);
         InteractableObject = null;
@@ -119,6 +124,17 @@ namespace TheLonelyOne.Player
     {
       yield return new WaitForSeconds(_duration);
       OnTeleportingEnd?.Invoke();
+    }
+
+    private bool TryGetInteractableComponents(GameObject _object, out IInteractable[] _interactableObject)
+    {
+      _interactableObject = _object.GetComponents<IInteractable>();
+
+      if (_interactableObject != null && _interactableObject.Length > 0)
+        return true;
+
+      _interactableObject = null;
+      return false;
     }
     #endregion
 
@@ -142,7 +158,7 @@ namespace TheLonelyOne.Player
       foreach (var collider in overlapColliders)
       {
         if (!collider.CompareTag("Player")
-            && collider.GetComponentInChildren<IInteractable>() is IInteractable interactable)
+            && TryGetInteractableComponents(collider.gameObject, out IInteractable[] interactable))
         {
           InteractableObject = interactable;
           interactableObjectsInArea.Add(interactable);
