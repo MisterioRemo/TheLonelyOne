@@ -17,11 +17,16 @@ namespace TheLonelyOne
     public SerializableDictionary<string, string> CombinationLocks;
     #endregion
 
+    #region PLOT
+    public SerializableHashSet<string> AchievedPlotPoints;
+    #endregion
+
     public GameData()
     {
       Objects             = new SerializableDictionary<string, ObjectData>();
       DialogueAssetStates = new SerializableDictionary<string, string>();
       CombinationLocks    = new SerializableDictionary<string, string>();
+      AchievedPlotPoints  = new SerializableHashSet<string>();
     }
   }
 }
