@@ -9,11 +9,11 @@ namespace TheLonelyOne
   public class SaveSystem : MonoBehaviour
   {
     #region PARAMETERS
-    protected string                 fileName;
-    protected bool                   useEncryption;
-    protected GameData               gameData;
-    protected List<IDataPersistence> dataPersistenceObjects;
-    protected PersistentDataHandler  persistentDataHandler;
+    private string                 fileName;
+    private bool                   useEncryption;
+    private GameData               gameData               = new GameData();
+    private List<IDataPersistence> dataPersistenceObjects = new List<IDataPersistence>();
+    private PersistentDataHandler  persistentDataHandler;
     #endregion
 
     [Inject]
@@ -24,15 +24,14 @@ namespace TheLonelyOne
     }
 
     #region LIFECYCLE
-    protected void Start()
+    private void Start()
     {
-      gameData               = new GameData();
       persistentDataHandler  = new PersistentDataHandler(Application.persistentDataPath, fileName, useEncryption);
-      dataPersistenceObjects = FindAllDataPersistenceObjects();
+      dataPersistenceObjects = Utils.Concat(dataPersistenceObjects, FindAllDataPersistenceMonoObjects());
       LoadGame();
     }
 
-    protected void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
       SaveGame();
     }
@@ -62,16 +61,26 @@ namespace TheLonelyOne
 
       persistentDataHandler.Save(gameData);
     }
+
+    public void AddDataPersistenceObject(IDataPersistence _object)
+    {
+      dataPersistenceObjects.Add(_object);
+    }
+
+    public void LoadDataPersistenceObject(IDataPersistence _object)
+    {
+      _object.Load(gameData);
+    }
     #endregion
 
     #region METHODS
-    protected void FocusChangedCallback(bool _hasFocus)
+    private void FocusChangedCallback(bool _hasFocus)
     {
       if (!_hasFocus)
         SaveGame();
     }
 
-    protected List<IDataPersistence> FindAllDataPersistenceObjects()
+    private List<IDataPersistence> FindAllDataPersistenceMonoObjects()
     {
       return FindObjectsOfType<MonoBehaviour>(true).OfType<IDataPersistence>().ToList();
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
@@ -73,6 +74,28 @@ namespace TheLonelyOne
     public static string GenerateGuid()
     {
       return System.Guid.NewGuid().ToString();
+    }
+
+    /// <summary>
+    /// Конкатенация списков при помощи AddRange и с заранее определённым размером.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="lists"></param>
+    /// <returns></returns>
+    public static List<T> Concat<T>(params List<T>[] lists)
+    {
+      if (lists == null)
+        return default;
+      else if (lists.Length == 1)
+        return lists[0];
+
+      int     count  = lists.Sum(list => list.Count);
+      List<T> result = new List<T>(count);
+
+      foreach(var list in lists)
+        result.AddRange(list);
+
+      return result;
     }
   }
 }
