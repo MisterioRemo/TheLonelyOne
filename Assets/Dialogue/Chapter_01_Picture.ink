@@ -19,6 +19,7 @@ VAR was_picture_moved = false
     > SetPosition picture/Sprite Vector3(-5.93,-1.52,0.49)
     ~ was_picture_moved = true
 Разумеется, нужен пароль.
+> CompletePlotPoint StrongboxIsOpen
 -> Interact
 
 == Interact

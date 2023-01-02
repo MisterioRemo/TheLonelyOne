@@ -11,6 +11,7 @@ namespace TheLonelyOne.Dialogue
       protected readonly DialogueManager  parent;
 
       [Inject] protected UIObjectsManager uiManager;
+      [Inject] protected PlotManager      plotManager;
 
       public DialogueAction(DialogueManager _dialogueManager)
       {
@@ -46,6 +47,11 @@ namespace TheLonelyOne.Dialogue
 
         parent.playerCtrl.ChangeInputActionsMap(Player.InputActionsMap.UI);
         canvas.SetActive(true);
+      }
+
+      public void CompletePlotPoint(string _name)
+      {
+        plotManager.FindPlotPoint(_name)?.Complete();
       }
     }
   }
