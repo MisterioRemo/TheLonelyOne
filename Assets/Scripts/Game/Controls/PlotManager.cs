@@ -23,13 +23,6 @@ namespace TheLonelyOne
     }
     #endregion
 
-    #region METHODS
-    private List<Goal.PlotPoint> FindAllPlotPoints()
-    {
-      return UnityEngine.Object.FindObjectsOfType<Goal.PlotPoint>().ToList();
-    }
-    #endregion
-
     #region INTERFACE
     public bool IsPlotPointAchieved(string _name)
     {
@@ -42,9 +35,21 @@ namespace TheLonelyOne
         Debug.LogError("Tried to add an already existing achieved plot point.");
     }
 
+    public bool RemoveAchievedPlotPoint(string _name)
+    {
+      return achievedPlotPoints.Remove(_name);
+    }
+
     public Goal.PlotPoint FindPlotPoint(string _name)
     {
       return UnityEngine.Object.FindObjectsOfType<Goal.PlotPoint>().FirstOrDefault(x => x.Name == _name);
+    }
+    #endregion
+
+    #region METHODS
+    private List<Goal.PlotPoint> FindAllPlotPoints()
+    {
+      return UnityEngine.Object.FindObjectsOfType<Goal.PlotPoint>().ToList();
     }
     #endregion
   }

@@ -51,7 +51,13 @@ namespace TheLonelyOne.Dialogue
 
       public void CompletePlotPoint(string _name)
       {
-        plotManager.FindPlotPoint(_name)?.Complete();
+        if (plotManager.FindPlotPoint(_name) is Goal.PlotPoint plotPoint)
+        {
+          plotPoint.Complete();
+          return;
+        }
+
+        plotManager.AddAchievedPlotPoint(_name);
       }
     }
   }

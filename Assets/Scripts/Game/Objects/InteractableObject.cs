@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
 using Zenject;
 
 namespace TheLonelyOne
 {
-  public class InteractableObject : MonoBehaviour, IInteractable
+  public class InteractableObject : MonoBehaviour, IInteractable, IEndEvent
   {
     #region PARAMETERS
     private GameObject icon;
@@ -25,6 +26,11 @@ namespace TheLonelyOne
                                      icon.SetActive(value);
                                  }
                                }
+    #endregion
+
+
+    #region EVENTS
+    public event Action OnEnded;
     #endregion
 
     [ContextMenu("Generate guid fo id")]
@@ -129,6 +135,13 @@ namespace TheLonelyOne
         IconVisability                = false;
         playerCtrl.OnInteractableSet -= InteractableSetCallback;
       }
+    }
+    #endregion
+
+    #region INTERFACE
+    public virtual void OnInteractionEnded()
+    {
+      OnEnded?.Invoke();
     }
     #endregion
 

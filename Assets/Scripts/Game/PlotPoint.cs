@@ -15,6 +15,7 @@ namespace TheLonelyOne.Goal
     #endregion
 
     #region IGOAL
+    [field: SerializeField]
     public virtual bool IsAchieved { get; protected set; }
 
     public virtual void Complete()
