@@ -45,7 +45,7 @@ namespace TheLonelyOne.Player
     protected virtual void Awake()
     {
       animator                  = GetComponent<Animator>();
-      interactableObjectsInArea = new HashSet<IInteractable[]>();
+      interactableObjectsInArea = new HashSet<IInteractable[]>(new ObjectArrayComparer<IInteractable>());
     }
 
     protected virtual void Start()
@@ -109,7 +109,8 @@ namespace TheLonelyOne.Player
 
     protected void OnTriggerExit2D(Collider2D _collision)
     {
-      if (interactableObject.Contains(_collision.GetComponent<IInteractable>()))
+      if (interactableObject != null
+          && interactableObject.Contains(_collision.GetComponent<IInteractable>()))
       {
         interactableObjectsInArea.Remove(InteractableObject);
         InteractableObject = null;
