@@ -10,7 +10,7 @@ namespace TheLonelyOne.Player
   /// Основа управления взята из проекта platformer-movement [https://github.com/Dawnosaur/platformer-movement]
   /// </summary>
   [RequireComponent(typeof(Rigidbody2D))]
-  public class PlayerMovementController : MonoBehaviour
+  public class PlayerMovementController : MonoBehaviour, IDataPersistence
   {
     #region PARAMETERS
     protected Rigidbody2D rigidbody2d;
@@ -55,6 +55,23 @@ namespace TheLonelyOne.Player
     public event Action<float> OnSpeedChange;
     public event Action<int>   OnDirectionChange;
     public event Action<bool>  OnMovingStateChange;
+    #endregion
+
+    #region IDataPersistence
+    public void Save(ref GameData _gameData)
+    {
+      _gameData.Player.Position  = transform.position;
+      _gameData.Player.Direction = Direction;
+    }
+
+    public void Load(GameData _gameData)
+    {
+      if (_gameData.Player.IsFirstLoading)
+        return;
+
+      transform.position = _gameData.Player.Position;
+      Direction          = _gameData.Player.Direction;
+    }
     #endregion
 
     #region LIFECYCLE

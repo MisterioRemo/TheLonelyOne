@@ -8,7 +8,7 @@ using CallbackContext = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 namespace TheLonelyOne.Player
 {
-  public class PlayerController : MonoBehaviour, ICharacter
+  public class PlayerController : MonoBehaviour, ICharacter, IDataPersistence
   {
     #region PARAMETERS
     protected Animator                 animator;
@@ -39,6 +39,17 @@ namespace TheLonelyOne.Player
     public event Action<Vector3>         OnTeleporting;
     public event Action                  OnTeleportingEnd;
     public event Action<IInteractable[]> OnInteractableSet;
+    #endregion
+
+    #region IDataPersistence
+    public void Save(ref GameData _gameData)
+    {
+      _gameData.Player.IsFirstLoading = false;
+    }
+
+    public void Load(GameData _gameData)
+    {
+    }
     #endregion
 
     #region LIFECYCLE

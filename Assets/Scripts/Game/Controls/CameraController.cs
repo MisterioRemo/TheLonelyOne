@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TheLonelyOne
 {
   [RequireComponent(typeof(BoxCollider2D))]
-  public class CameraController : MonoBehaviour
+  public class CameraController : MonoBehaviour, IDataPersistence
   {
     public enum UnfixingCondition : byte
     {
@@ -27,6 +27,29 @@ namespace TheLonelyOne
     /// Only horizontal fix.
     /// </summary>
     public bool          IsPositionFixed { get; set; }
+    #endregion
+
+    #region IDataPersistence
+    public void Save(ref GameData _gameData)
+    {
+      _gameData.Player.MainCamera.Position          = transform.position;
+      _gameData.Player.MainCamera.IsPositionFixed   = IsPositionFixed;
+      _gameData.Player.MainCamera.FixedPosition     = fixedPosition;
+      _gameData.Player.MainCamera.UnfixingCondition = (byte)unfixingCondition;
+      _gameData.Player.MainCamera.AllowedDirection  = (byte)allowedDirection;
+    }
+
+    public void Load(GameData _gameData)
+    {
+      if (_gameData.Player.IsFirstLoading)
+        return;
+
+      transform.position = _gameData.Player.MainCamera.Position;
+      IsPositionFixed    = _gameData.Player.MainCamera.IsPositionFixed;
+      fixedPosition      = _gameData.Player.MainCamera.FixedPosition;
+      unfixingCondition  = (UnfixingCondition)_gameData.Player.MainCamera.UnfixingCondition;
+      allowedDirection   = (MovementDirection)_gameData.Player.MainCamera.AllowedDirection;
+    }
     #endregion
 
     #region LIFECYCLE

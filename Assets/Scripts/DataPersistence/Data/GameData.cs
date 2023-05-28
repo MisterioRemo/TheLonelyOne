@@ -6,6 +6,7 @@ namespace TheLonelyOne
   public class GameData
   {
     #region OBJECTS
+    public PlayerData                                 Player;
     public SerializableDictionary<string, ObjectData> Objects;
     #endregion
 
@@ -23,6 +24,7 @@ namespace TheLonelyOne
 
     public GameData()
     {
+      Player              = new PlayerData();
       Objects             = new SerializableDictionary<string, ObjectData>();
       DialogueAssetStates = new SerializableDictionary<string, string>();
       CombinationLocks    = new SerializableDictionary<string, string>();
