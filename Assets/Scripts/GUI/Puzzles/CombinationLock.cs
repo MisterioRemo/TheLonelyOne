@@ -32,21 +32,33 @@ namespace TheLonelyOne.UI
     public void Save(ref GameData _gameData)
     {
       if (!String.IsNullOrEmpty(currentCombination))
-        _gameData.CombinationLocks[id] = currentCombination;
+      {
+        _gameData.CombinationLocks[id]                 = new CombinationLockData();
+        _gameData.CombinationLocks[id].LastCombination = currentCombination;
+        _gameData.CombinationLocks[id].IsActive        = gameObject.activeSelf;
+
+      }
     }
 
     public void Load(GameData _gameData)
     {
-      _gameData.CombinationLocks.TryGetValue(id, out string combination);
+      _gameData.CombinationLocks.TryGetValue(id, out CombinationLockData combination);
 
-      if (!String.IsNullOrEmpty(combination))
-        currentCombination = combination;
+      if (combination != null)
+      {
+        currentCombination = combination.LastCombination;
+        gameObject.SetActive(combination.IsActive);
+      }
+
     }
     #endregion
 
     #region LIFECYCLE
     protected void Awake()
     {
+      if (currentCombination == rightCombination)
+        IsCombinationValid = true;
+
       bool firstInitialization = string.IsNullOrEmpty(currentCombination);
 
       lockElements = new List<ICombinationLockElement>();

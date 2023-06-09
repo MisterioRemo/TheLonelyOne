@@ -15,19 +15,24 @@ namespace TheLonelyOne
     #endregion
 
     #region PUZZLES
-    public SerializableDictionary<string, string> CombinationLocks;
+    public SerializableDictionary<string, CombinationLockData> CombinationLocks;
     #endregion
 
     #region PLOT
     public SerializableHashSet<string> AchievedPlotPoints;
     #endregion
 
+    #region UI
+    public SerializableDictionary<string, UIData> UIObjects;
+    #endregion
+
     public GameData()
     {
       Player              = new PlayerData();
       Objects             = new SerializableDictionary<string, ObjectData>();
+      UIObjects           = new SerializableDictionary<string, UIData>();
       DialogueAssetStates = new SerializableDictionary<string, string>();
-      CombinationLocks    = new SerializableDictionary<string, string>();
+      CombinationLocks    = new SerializableDictionary<string, CombinationLockData>();
       AchievedPlotPoints  = new SerializableHashSet<string>();
     }
   }
