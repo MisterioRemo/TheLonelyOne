@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Ink.Runtime;
@@ -94,14 +94,14 @@ namespace TheLonelyOne.Dialogue
     #endregion
 
     #region INTREFACE
-    public void StartDialogue(TextAsset _inkAsset, string _inkState, Action<string> _updateInkStateCallback)
+    public void StartDialogue(TextAsset _inkAsset, string _inkState, Action<string> _updateInkStateCallback, string _inkEntryPoint)
     {
       inkStory               = new Story(_inkAsset.text);
       IsDialoguePlaying      = true;
       updateInkStateCallback = _updateInkStateCallback;
       playerCtrl.CanMove     = false;
 
-      SetStoryState(inkStory, _inkState);
+      SetStoryState(inkStory, _inkState, _inkEntryPoint);
       Parser.ParseTags(inkStory.globalTags);
       ContinueDialogue();
     }
@@ -170,12 +170,12 @@ namespace TheLonelyOne.Dialogue
       updateInkStateCallback = null;
     }
 
-    protected void SetStoryState(Story _inkStory, string _inkState)
+    protected void SetStoryState(Story _inkStory, string _inkState, string _inkEntryPoint)
     {
       if (!string.IsNullOrEmpty(_inkState))
         _inkStory.state.LoadJson(_inkState);
 
-      _inkStory.ChoosePathString("EntryPoint");
+      _inkStory.ChoosePathString(_inkEntryPoint);
     }
 
     protected void DrawSpeechBubble(DialogueParticipant _dialogueParticipant, string _text, bool _hasChoice = false)

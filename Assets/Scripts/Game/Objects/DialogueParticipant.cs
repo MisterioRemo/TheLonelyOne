@@ -45,7 +45,7 @@ namespace TheLonelyOne
     public virtual void Interact()
     {
       if (!dialogueManager.IsDialoguePlaying)
-        dialogueManager.StartDialogue(inkAsset, inkState, UpdateInkState);
+        StartDialogue();
       else
         dialogueManager.ContinueDialogue();
     }
@@ -112,9 +112,26 @@ namespace TheLonelyOne
       speechBubble.transform.position = Camera.main.WorldToScreenPoint(speechBubblePosition);
     }
 
+    public void StartDialogue(string _inkEntryPoint = "EntryPoint")
+    {
+      dialogueManager.StartDialogue(inkAsset, inkState, UpdateInkState, _inkEntryPoint);
+    }
+
     public void UpdateInkState(string _savedJson)
     {
       inkState = _savedJson;
+    }
+    /// <summary>
+    /// Return current variable value from Ink Story. Expensive operation.
+    /// </summary>
+    public object GetInkVariableState(string _varName)
+    {
+      var story = new Ink.Runtime.Story(inkAsset.text);
+
+      if (!string.IsNullOrEmpty(inkState))
+        story.state.LoadJson(inkState);
+
+      return story.variablesState[_varName];
     }
     #endregion
   }

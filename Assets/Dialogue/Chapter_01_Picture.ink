@@ -3,6 +3,7 @@
 
 VAR is_first_visit    = true
 VAR was_picture_moved = false
+VAR is_reaction_seen  = false
 
 === EntryPoint ===
 {was_picture_moved: -> Interact }
@@ -25,3 +26,10 @@ VAR was_picture_moved = false
 == Interact
 > ShowUI Strongbox
 ->END
+
+=== FirstReaction ===
+...
+.....
+Святые предки, кто ставит пароль на пустой сейф?!
+~ is_reaction_seen = true
+-> END

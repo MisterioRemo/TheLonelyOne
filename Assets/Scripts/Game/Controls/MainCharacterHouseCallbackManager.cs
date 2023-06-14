@@ -5,19 +5,31 @@ namespace TheLonelyOne
   public class MainCharacterHouseCallbackManager : MonoBehaviour
   {
     #region PARAMETERS
-    [SerializeField] protected UI.CombinationLock combinationLock;
-    [SerializeField] protected int                strongboxSpriteId;
+    [Header("Strongbox")]
+    [SerializeField] protected UI.CombinationLock    combinationLock;
+    [SerializeField] protected int                   strongboxSpriteId;
+    [SerializeField] protected UnityEngine.UI.Button strongboxCloseButton;
+    [SerializeField] protected DialogueParticipant   strongboxDialogueParticipant;
+
+    protected bool isStrongboxReactionSeen;
+    // [Space(10)]
     #endregion
 
     #region LIFECYCLE
     protected virtual void Start()
     {
-      combinationLock.OnPuzzleCompleted += OpenStrongbox;
+      isStrongboxReactionSeen = (bool)strongboxDialogueParticipant.GetInkVariableState("is_reaction_seen");
+
+      if (combinationLock.gameObject.activeSelf)
+        combinationLock.OnPuzzleCompleted += OpenStrongbox;
+      if (!isStrongboxReactionSeen)
+        strongboxCloseButton.onClick.AddListener(StartStrongboxDialogue);
     }
 
     protected virtual void OnDestroy()
     {
       combinationLock.OnPuzzleCompleted -= OpenStrongbox;
+      strongboxCloseButton.onClick.RemoveListener(StartStrongboxDialogue);
     }
     #endregion
 
@@ -26,6 +38,15 @@ namespace TheLonelyOne
     {
       combinationLock.transform.parent.Find("Background").GetComponent<UISpriteState>().SetSprite(strongboxSpriteId);
       combinationLock.gameObject.SetActive(false);
+    }
+
+    private void StartStrongboxDialogue()
+    {
+      if (!combinationLock.gameObject.activeSelf && !isStrongboxReactionSeen)
+      {
+        strongboxDialogueParticipant.StartDialogue("FirstReaction");
+        isStrongboxReactionSeen = true;
+      }
     }
     #endregion
   }

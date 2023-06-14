@@ -45,13 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e22f2a159594043a2a7c1ee7e1ba08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 
   participantName: 
+  participantSpriteRenderer: {fileID: 0}
   inkAsset: {fileID: 0}
-  speechBubble: {fileID: 2529364751037707990}
-  speechBubbleText: {fileID: 7293537322379345816}
-  speechBubbleArrows:
-  - {fileID: 2987266566313912370}
-  - {fileID: 2185128467361147201}
+  speechBubbleOffset: {x: 0, y: 0}
 --- !u!1 &2182398442874320616
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,7 +106,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
+  m_ChildAlignment: 5
   m_Spacing: 0
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
