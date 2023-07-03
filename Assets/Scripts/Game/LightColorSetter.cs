@@ -15,6 +15,9 @@ namespace TheLonelyOne
     #region ICOLORSETTER
     public void SetColor(float time)
     {
+      if (!gameObject.activeInHierarchy || light2D == null)
+        return;
+
       if (preset == null)
       {
         Debug.LogError($"LightColorPreset is not set for the object '{name}'.");
