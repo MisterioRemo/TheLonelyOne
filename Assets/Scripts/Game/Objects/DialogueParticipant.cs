@@ -10,6 +10,7 @@ namespace TheLonelyOne
   {
     #region PARAMETERS
     [SerializeField] protected string id;
+    [SerializeField] protected bool   shouldSaveInkState = true;
 
     [Header("Participant")]
     [SerializeField] protected string         participantName;
@@ -54,13 +55,14 @@ namespace TheLonelyOne
     #region IDataPersistence
     public virtual void Save(ref GameData _gameData)
     {
-      if (!string.IsNullOrEmpty(inkState))
+      if (shouldSaveInkState && !string.IsNullOrEmpty(inkState))
         _gameData.DialogueAssetStates[id] = inkState;
     }
 
     public virtual void Load(GameData _gameData)
     {
-      _gameData.DialogueAssetStates.TryGetValue(id, out inkState);
+      if (shouldSaveInkState)
+        _gameData.DialogueAssetStates.TryGetValue(id, out inkState);
     }
     #endregion
 
@@ -119,7 +121,8 @@ namespace TheLonelyOne
 
     public void UpdateInkState(string _savedJson)
     {
-      inkState = _savedJson;
+      if (shouldSaveInkState)
+        inkState = _savedJson;
     }
     /// <summary>
     /// Return current variable value from Ink Story. Expensive operation.

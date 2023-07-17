@@ -6192,6 +6192,10 @@ PrefabInstance:
       value: Picture
       objectReference: {fileID: 0}
     - target: {fileID: 3489704227452969727, guid: 04d3edab8fd40dd4080055283a5e767a, type: 3}
+      propertyPath: shouldSaveInkState
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3489704227452969727, guid: 04d3edab8fd40dd4080055283a5e767a, type: 3}
       propertyPath: participantSpriteRenderer
       value: 
       objectReference: {fileID: 0}
