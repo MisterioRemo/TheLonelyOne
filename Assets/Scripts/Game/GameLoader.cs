@@ -5,12 +5,15 @@ namespace TheLonelyOne
 {
   public class GameLoader : MonoBehaviour
   {
+    #region PARAMETERS
     [Inject] protected DiContainer diContainer;
+    #endregion
 
-    private void Awake()
+    #region LIFECYCLE
+    protected void Awake()
     {
-      enabled = false;
       DiContainerRef.Container = diContainer;
     }
+    #endregion
   }
 }
