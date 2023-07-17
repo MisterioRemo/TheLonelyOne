@@ -1,10 +1,13 @@
 using UnityEngine;
+using Zenject;
 
 namespace TheLonelyOne
 {
   public class MainCharacterHouseCallbackManager : MonoBehaviour
   {
     #region PARAMETERS
+    [Inject] protected PlotManager plotManager;
+
     [Header("Strongbox")]
     [SerializeField] protected UI.CombinationLock    combinationLock;
     [SerializeField] protected int                   strongboxSpriteId;
@@ -38,6 +41,7 @@ namespace TheLonelyOne
     {
       combinationLock.transform.parent.Find("Background").GetComponent<UISpriteState>().SetSprite(strongboxSpriteId);
       combinationLock.gameObject.SetActive(false);
+      plotManager.AddAchievedPlotPoint("StrongboxIsOpen");
     }
 
     private void StartStrongboxDialogue()
