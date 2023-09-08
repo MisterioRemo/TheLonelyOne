@@ -27,7 +27,7 @@ namespace TheLonelyOne.Dialogue
       public void SetPosition(string _targetName, string _position)
       {
         SetPositionImplementation(parent.Parser.ParseFuctionTarget(_targetName),
-                                  Utils.ParseToVector3(_position));
+                                  TheLonelyOne.Utils.ParseToVector3(_position));
       }
 
       public void SetPositionImplementation(GameObject _gameObject, Vector3 _position)
@@ -58,6 +58,11 @@ namespace TheLonelyOne.Dialogue
         }
 
         plotManager.AddAchievedPlotPoint(_name);
+      }
+
+      public void Clear()
+      {
+        parent.Narration.Clear();
       }
     }
   }

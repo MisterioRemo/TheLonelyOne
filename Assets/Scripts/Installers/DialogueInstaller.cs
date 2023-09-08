@@ -1,9 +1,11 @@
+using UnityEngine;
 using Zenject;
 
 namespace TheLonelyOne
 {
   public class DialogueInstaller : MonoInstaller
   {
+    [SerializeField] protected GameObject narrationWindowUIPrefab;
     public override void InstallBindings()
     {
       Container
@@ -11,6 +13,8 @@ namespace TheLonelyOne
         .FromNew()
         .AsSingle()
         .NonLazy();
+
+      Container.BindInstance(narrationWindowUIPrefab).WhenInjectedInto<Dialogue.DialogueManager>();
     }
   }
 }

@@ -17,7 +17,7 @@ namespace TheLonelyOne.Dialogue
         parent = _dialogueManager;
       }
 
-      #region FUNCTIONS
+      #region METHODS
       internal bool ParseFunction(string _text, out string _functionName, out string[] _params)
       {
         if (!_text.StartsWith('>'))
@@ -41,8 +41,8 @@ namespace TheLonelyOne.Dialogue
 
       public GameObject ParseFuctionTarget(string _targetName)
       {
-        string[] hierarchy     = _targetName.Split('/', 2);
-        string participantName = hierarchy[0].ToLower();
+        string[] hierarchy       = _targetName.Split('/', 2);
+        string   participantName = hierarchy[0].ToLower();
 
         if (parent.participants.ContainsKey(participantName))
         {

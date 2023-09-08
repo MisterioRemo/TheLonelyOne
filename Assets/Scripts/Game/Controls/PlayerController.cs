@@ -26,6 +26,7 @@ namespace TheLonelyOne.Player
     public MovementDirection BlockMovementInDirection { get => movementCtrl.BlockedDirection;
                                                         set => movementCtrl.BlockedDirection = value;
                                                       }
+    public bool              CanInteract              { get; set; } = true;
     public IInteractable[]   InteractableObject       { get => interactableObject;
                                                         private set {
                                                           interactableObject = value;
@@ -83,6 +84,9 @@ namespace TheLonelyOne.Player
     #region INPUT ACTIONS CALLBACKS
     protected void InteractionPressed(CallbackContext _context)
     {
+      if (!CanInteract)
+        return;
+
       if (interactableObject != null && interactableObject.Length != 0)
       {
         foreach (var obj in interactableObject)

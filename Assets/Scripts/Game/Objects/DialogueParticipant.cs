@@ -45,10 +45,7 @@ namespace TheLonelyOne
     #region IInteractable
     public virtual void Interact()
     {
-      if (!dialogueManager.IsDialoguePlaying)
-        StartDialogue();
-      else
-        dialogueManager.ContinueDialogue();
+      StartDialogue();
     }
     #endregion
 
@@ -124,17 +121,10 @@ namespace TheLonelyOne
       if (shouldSaveInkState)
         inkState = _savedJson;
     }
-    /// <summary>
-    /// Return current variable value from Ink Story. Expensive operation.
-    /// </summary>
+
     public object GetInkVariableState(string _varName)
     {
-      var story = new Ink.Runtime.Story(inkAsset.text);
-
-      if (!string.IsNullOrEmpty(inkState))
-        story.state.LoadJson(inkState);
-
-      return story.variablesState[_varName];
+      return Dialogue.Utils.GetInkVariableState(inkAsset, inkState, _varName);
     }
     #endregion
   }

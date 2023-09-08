@@ -1,4 +1,5 @@
 using UnityEngine;
+using TheLonelyOne.Dialogue;
 using Zenject;
 
 namespace TheLonelyOne
@@ -6,7 +7,12 @@ namespace TheLonelyOne
   public class MainCharacterHouseCallbackManager : MonoBehaviour
   {
     #region PARAMETERS
-    [Inject] protected PlotManager plotManager;
+    [Inject] protected PlotManager     plotManager;
+    [Inject] protected DialogueManager dialogueManager;
+
+    [Header("Intro")]
+    [SerializeField] protected TextAsset inkIntro;
+    [Space(10)]
 
     [Header("Strongbox")]
     [SerializeField] protected UI.CombinationLock    combinationLock;
@@ -21,6 +27,11 @@ namespace TheLonelyOne
     #region LIFECYCLE
     protected virtual void Start()
     {
+      // Intro
+      if (!plotManager.IsPlotPointAchieved("NarrationIntroIsSeen"))
+        dialogueManager.StartNarration(inkIntro);
+
+      // Strongbox
       isStrongboxReactionSeen = (bool)strongboxDialogueParticipant.GetInkVariableState("is_reaction_seen");
 
       if (combinationLock.gameObject.activeSelf)

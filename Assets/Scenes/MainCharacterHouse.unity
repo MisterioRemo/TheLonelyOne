@@ -4502,6 +4502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b7a329e60965f449976549e9f5665b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inkIntro: {fileID: 4900000, guid: de3fc4de8c2ffea43b9dd10da3cec369, type: 3}
   combinationLock: {fileID: 1647263878}
   strongboxSpriteId: 1
   strongboxCloseButton: {fileID: 1053059030}
@@ -6110,6 +6111,10 @@ PrefabInstance:
       propertyPath: setPauseTime
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5279864624838753667, guid: 5ebc9b2fe8f693b4caefa8d79eb84c0b, type: 3}
+      propertyPath: narrationWindowUIPrefab
+      value: 
+      objectReference: {fileID: 92302047103793365, guid: 4e2347c3afa9b4847bf875f0de3cd1e8, type: 3}
     - target: {fileID: 5279864626727631145, guid: 5ebc9b2fe8f693b4caefa8d79eb84c0b, type: 3}
       propertyPath: player
       value: 

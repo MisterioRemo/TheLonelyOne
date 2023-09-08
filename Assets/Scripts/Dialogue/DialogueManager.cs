@@ -9,6 +9,12 @@ namespace TheLonelyOne.Dialogue
 {
   public partial class DialogueManager : IInitializable, IDisposable
   {
+    public enum DialogueMode : byte
+    {
+      Dialogue,
+      Narration
+    }
+
     #region PARAMETERS
     protected Story                                   inkStory;
     protected string                                  currentParticipantName;
@@ -19,14 +25,16 @@ namespace TheLonelyOne.Dialogue
 
     protected Action<string>                          updateInkStateCallback;
 
-    public    readonly DialogueParser Parser;
-    protected          DialogueAction dialogueAction;
+    public    readonly DialogueParser  Parser;
+    public    readonly NarrationWindow Narration;
+    protected          DialogueAction  dialogueAction;
 
     [Inject] protected Player.PlayerController playerCtrl;
     [Inject] protected PlayerInputActions      inputActions;
     #endregion
 
     #region PROPERTIES
+    public DialogueMode Mode { get; set; } = DialogueMode.Dialogue;
     public bool IsDialoguePlaying { get; protected set; }
     protected int CurrentChoiceIndex { get => currentChoiceIndex;
                                        set {
@@ -41,10 +49,11 @@ namespace TheLonelyOne.Dialogue
                                      }
     #endregion
 
-    public DialogueManager()
+    public DialogueManager(GameObject _narrationWindowUIPrefab)
     {
       participants   = new Dictionary<string, DialogueParticipant>();
       Parser         = new DialogueParser(this);
+      Narration      = GameObject.Instantiate(_narrationWindowUIPrefab, Vector3.zero, Quaternion.identity).GetComponent<NarrationWindow>();
     }
 
     #region IInitializable
@@ -54,6 +63,7 @@ namespace TheLonelyOne.Dialogue
       dialogueAction = DiContainerRef.Container.Instantiate<DialogueAction>(new object[] { this });
 
       inputActions.Player.Movement.performed += ShowNextDialogueChoice;
+      inputActions.Player.Interact.performed += ContinueDialogue;
 
       ResetParameters();
     }
@@ -63,6 +73,7 @@ namespace TheLonelyOne.Dialogue
     public void Dispose()
     {
       inputActions.Player.Movement.performed -= ShowNextDialogueChoice;
+      inputActions.Player.Interact.performed -= ContinueDialogue;
     }
     #endregion
 
@@ -91,15 +102,28 @@ namespace TheLonelyOne.Dialogue
       if (IsDialoguePlaying && isChoosingChoie && inkStory.currentChoices.Count > 0)
         ShowDialogueChoice(CurrentChoiceIndex + (int)_context.ReadValue<Vector2>().x);
     }
+
+    protected void ContinueDialogue(CallbackContext _context)
+    {
+      ContinueDialogue();
+    }
     #endregion
 
     #region INTREFACE
+    public void StartNarration(TextAsset _inkAsset)
+    {
+      Mode = DialogueMode.Narration;
+      Narration.SetVisibility(true);
+      StartDialogue(_inkAsset, null, null, "EntryPoint");
+    }
+
     public void StartDialogue(TextAsset _inkAsset, string _inkState, Action<string> _updateInkStateCallback, string _inkEntryPoint)
     {
       inkStory               = new Story(_inkAsset.text);
       IsDialoguePlaying      = true;
       updateInkStateCallback = _updateInkStateCallback;
       playerCtrl.CanMove     = false;
+      playerCtrl.CanInteract = false;
 
       SetStoryState(inkStory, _inkState, _inkEntryPoint);
       Parser.ParseTags(inkStory.globalTags);
@@ -128,7 +152,11 @@ namespace TheLonelyOne.Dialogue
           return;
         }
 
-        DrawSpeechBubble(participants[currentParticipantName], inkStory.currentText);
+        if (Mode == DialogueMode.Dialogue)
+          DrawSpeechBubble(participants[currentParticipantName], inkStory.currentText);
+        else
+          Narration.DrawNarration(inkStory.currentText);
+
         return;
       }
 
@@ -152,8 +180,13 @@ namespace TheLonelyOne.Dialogue
 
     public void EndDialogue()
     {
-      updateInkStateCallback(inkStory.state.ToJson());
-      playerCtrl.CanMove = true;
+      if (updateInkStateCallback != null)
+        updateInkStateCallback(inkStory.state.ToJson());
+      if (Mode == DialogueMode.Narration)
+        Narration.SetVisibility(false);
+
+      playerCtrl.CanMove     = true;
+      playerCtrl.CanInteract = true;
       ResetParameters();
     }
     #endregion
@@ -168,6 +201,7 @@ namespace TheLonelyOne.Dialogue
       IsDialoguePlaying      = false;
       inkStory               = null;
       updateInkStateCallback = null;
+      Mode                   = DialogueMode.Dialogue;
     }
 
     protected void SetStoryState(Story _inkStory, string _inkState, string _inkEntryPoint)
