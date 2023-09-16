@@ -1,19 +1,29 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 namespace TheLonelyOne.Dialogue
 {
   public class NarrationWindow : MonoBehaviour
   {
-    #region PARAMETERS
-    private TextMeshProUGUI text;
+    #region CONSTANTS
+    private const float TYPING_DELAY = 0.05f;
     #endregion
 
-    public string Text
-    {
-      get => text.text;
-      set => text.text = value;
-    }
+    #region PARAMETERS
+    private TextMeshProUGUI text;
+    private IEnumerator     typingCoroutine;
+    private string          typingSentence;
+    private int             typingIndex;
+    private bool            isClearDeferred = false;
+    #endregion
+
+    #region PROPERTIES
+    public bool   IsTyping { get; private set; } = false;
+    public string Text     { get => text.text;
+                             set => text.text = value;
+                           }
+    #endregion
 
     public void Start()
     {
@@ -25,6 +35,20 @@ namespace TheLonelyOne.Dialogue
     }
 
     #region METHODS
+    private IEnumerator TypeText(string _sentence, float _delay)
+    {
+      IsTyping    = true;
+      typingIndex = 0;
+
+      foreach (char c in _sentence)
+      {
+        Text += c;
+        typingIndex++;
+        yield return new WaitForSeconds(_delay);
+      }
+
+      IsTyping = false;
+    }
     #endregion
 
     #region INTERFACE
@@ -36,12 +60,39 @@ namespace TheLonelyOne.Dialogue
 
     public void DrawNarration(string _sentence)
     {
-      text.text += _sentence;
+      StopTyping();
+
+      if (isClearDeferred)
+      {
+        Clear();
+        isClearDeferred = false;
+      }
+
+      typingSentence  = _sentence;
+      typingCoroutine = TypeText(_sentence, TYPING_DELAY);
+      StartCoroutine(typingCoroutine);
+    }
+
+    public void StopTyping()
+    {
+      if (!IsTyping)
+        return;
+
+      StopCoroutine(typingCoroutine);
+      typingCoroutine = null;
+      IsTyping        = false;
+      Text            += typingSentence.Substring(typingIndex);
     }
 
     public void Clear()
     {
-      text.text = "";
+      if (IsTyping)
+      {
+        isClearDeferred = true;
+        return;
+      }
+
+      Text = "";
     }
     #endregion
   }

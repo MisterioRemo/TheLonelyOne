@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 namespace TheLonelyOne.Dialogue
 {
@@ -16,15 +15,6 @@ namespace TheLonelyOne.Dialogue
         story.state.LoadJson(_inkState);
 
       return story.variablesState[_varName];
-    }
-
-    public static IEnumerator TypeText(string _finalText, string _sentence, float _delay)
-    {
-      foreach (char c in _sentence)
-      {
-        _finalText += c;
-        yield return new WaitForSeconds(_delay);
-      }
     }
   }
 }

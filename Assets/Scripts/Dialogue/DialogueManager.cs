@@ -138,6 +138,12 @@ namespace TheLonelyOne.Dialogue
       if (currentParticipantName != null)
         participants[currentParticipantName].SetSpeechBubbleVisibility(false);
 
+      if (Mode == DialogueMode.Narration && Narration.IsTyping)
+      {
+        Narration.StopTyping();
+        return;
+      }
+
       if (inkStory.canContinue)
       {
         inkStory.Continue();
