@@ -68,7 +68,7 @@ namespace TheLonelyOne.Player
       movementCtrl.OnDirectionChange   += SetDirectionAnimation;
       movementCtrl.OnSpeedChange       += SetSpeedAnimation;
 
-      DetectNearestInteractableObject();
+      StartCoroutine(PostStart());
     }
 
     protected virtual void OnDestroy()
@@ -136,6 +136,13 @@ namespace TheLonelyOne.Player
     #endregion
 
     #region METHODS
+    private IEnumerator PostStart()
+    {
+      yield return new WaitForEndOfFrame();
+
+      DetectNearestInteractableObject();
+    }
+
     protected IEnumerator TeleportEnd(float _duration)
     {
       yield return new WaitForSeconds(_duration);
