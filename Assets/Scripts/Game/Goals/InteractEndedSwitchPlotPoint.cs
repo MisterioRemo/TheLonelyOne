@@ -1,6 +1,6 @@
 namespace TheLonelyOne.Goal
 {
-  public class OpenDoorPlotPoint : PlotPoint, IReversible
+  public class InteractEndedSwitchPlotPoint : PlotPoint, IReversible
   {
     #region PARAMETERS
     protected InteractableObject interactableObject;

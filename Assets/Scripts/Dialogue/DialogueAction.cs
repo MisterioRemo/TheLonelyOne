@@ -60,6 +60,17 @@ namespace TheLonelyOne.Dialogue
         plotManager.AddAchievedPlotPoint(_name);
       }
 
+      public void RemoveAchievedPlotPoint(string _name)
+      {
+        if (plotManager.FindPlotPoint(_name) is IReversible plotPoint)
+        {
+          plotPoint.Undo();
+          return;
+        }
+
+        plotManager.RemoveAchievedPlotPoint(_name);
+      }
+
       public void Clear()
       {
         parent.Narration.Clear();

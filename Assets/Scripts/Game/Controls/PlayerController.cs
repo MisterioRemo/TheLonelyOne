@@ -28,18 +28,13 @@ namespace TheLonelyOne.Player
                                                       }
     public bool              CanInteract              { get; set; } = true;
     public IInteractable[]   InteractableObject       { get => interactableObject;
-                                                        private set {
-                                                          interactableObject = value;
-                                                          if (interactableObject != null)
-                                                            OnInteractableSet?.Invoke(interactableObject);
-                                                        }
+                                                        private set => interactableObject = value;
                                                       }
     #endregion
 
     #region EVENTS
     public event Action<Vector3>         OnTeleporting;
     public event Action                  OnTeleportingEnd;
-    public event Action<IInteractable[]> OnInteractableSet;
     #endregion
 
     #region IDataPersistence

@@ -111,30 +111,19 @@ namespace TheLonelyOne
     {
       icon = transform.Find("Icon").gameObject;
     }
-
-    protected virtual void OnDestroy()
-    {
-      playerCtrl.OnInteractableSet -= InteractableSetCallback;
-    }
     #endregion
 
     #region COLLISIONS
     protected virtual void OnTriggerEnter2D(Collider2D _collision)
     {
       if (_collision.CompareTag("Player"))
-      {
-        IconVisability                = true;
-        playerCtrl.OnInteractableSet += InteractableSetCallback;
-      }
+        IconVisability = ShouldDisplayIcon();
     }
 
     protected virtual void OnTriggerExit2D(Collider2D _collision)
     {
       if (_collision.CompareTag("Player"))
-      {
-        IconVisability                = false;
-        playerCtrl.OnInteractableSet -= InteractableSetCallback;
-      }
+        IconVisability = false;
     }
     #endregion
 
@@ -146,9 +135,9 @@ namespace TheLonelyOne
     #endregion
 
     #region METHODS
-    private void InteractableSetCallback(IInteractable[] _interactable)
+    protected virtual bool ShouldDisplayIcon()
     {
-      IconVisability = _interactable.Contains((IInteractable)this);
+      return playerCtrl.InteractableObject.Contains((IInteractable)this);
     }
     #endregion
   }

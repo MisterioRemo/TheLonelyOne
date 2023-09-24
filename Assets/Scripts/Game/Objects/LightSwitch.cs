@@ -45,6 +45,7 @@ namespace TheLonelyOne
 
       SwitchSprite(currentState);
       SwitchLights(currentState);
+      base.OnInteractionEnded();
     }
 
     protected override ObjectStateData SaveObjectState(GameObject _target)
