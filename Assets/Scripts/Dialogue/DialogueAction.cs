@@ -12,6 +12,7 @@ namespace TheLonelyOne.Dialogue
 
       [Inject] protected UIObjectsManager uiManager;
       [Inject] protected PlotManager      plotManager;
+      [Inject] protected GameLoader       gameLoader;
 
       public DialogueAction(DialogueManager _dialogueManager)
       {
@@ -74,6 +75,11 @@ namespace TheLonelyOne.Dialogue
       public void Clear()
       {
         parent.Narration.Clear();
+      }
+
+      public void LoadScene(string _sceneName)
+      {
+        gameLoader.LoadScene(_sceneName);
       }
     }
   }

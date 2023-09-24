@@ -7,8 +7,9 @@ namespace TheLonelyOne
   public class MainCharacterHouseCallbackManager : MonoBehaviour
   {
     #region PARAMETERS
-    [Inject] protected PlotManager     plotManager;
-    [Inject] protected DialogueManager dialogueManager;
+    [Inject] protected PlotManager          plotManager;
+    [Inject] protected DialogueManager      dialogueManager;
+    [Inject] protected LightColorController lightColorCtrl;
 
     [Header("Intro")]
     [SerializeField] protected TextAsset inkIntro;
@@ -21,7 +22,10 @@ namespace TheLonelyOne
     [SerializeField] protected DialogueParticipant   strongboxDialogueParticipant;
 
     protected bool isStrongboxReactionSeen;
-    // [Space(10)]
+    [Space(10)]
+
+    [Header("Scene time limit")]
+    [SerializeField] protected TextAsset inkTimeLimit;
     #endregion
 
     #region LIFECYCLE
@@ -38,12 +42,19 @@ namespace TheLonelyOne
         combinationLock.OnPuzzleCompleted += OpenStrongbox;
       if (!isStrongboxReactionSeen)
         strongboxCloseButton.onClick.AddListener(StartStrongboxDialogue);
+
+      // Scene time limit
+      lightColorCtrl.OnPauseTimeReached += OnStayingAtHomeTimeLimitReached;
     }
 
     protected virtual void OnDestroy()
     {
+      // Strongbox
       combinationLock.OnPuzzleCompleted -= OpenStrongbox;
       strongboxCloseButton.onClick.RemoveListener(StartStrongboxDialogue);
+
+      // Scene time limit
+      lightColorCtrl.OnPauseTimeReached -= OnStayingAtHomeTimeLimitReached;
     }
     #endregion
 
@@ -62,6 +73,11 @@ namespace TheLonelyOne
         strongboxDialogueParticipant.StartDialogue("FirstReaction");
         isStrongboxReactionSeen = true;
       }
+    }
+
+    private void OnStayingAtHomeTimeLimitReached()
+    {
+      dialogueManager.StartNarration(inkTimeLimit);
     }
     #endregion
   }

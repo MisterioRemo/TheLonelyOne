@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System;
 using UnityEngine;
@@ -116,8 +117,9 @@ namespace TheLonelyOne
     #region COLLISIONS
     protected virtual void OnTriggerEnter2D(Collider2D _collision)
     {
+      // необходимо, чтобы обработка коллизии была проведена сначала для PlayerController
       if (_collision.CompareTag("Player"))
-        IconVisability = ShouldDisplayIcon();
+        StartCoroutine(OnTriggerEnter2DEndOfFrame());
     }
 
     protected virtual void OnTriggerExit2D(Collider2D _collision)
@@ -135,6 +137,13 @@ namespace TheLonelyOne
     #endregion
 
     #region METHODS
+    private IEnumerator OnTriggerEnter2DEndOfFrame()
+    {
+      yield return new WaitForEndOfFrame();
+
+      IconVisability = ShouldDisplayIcon();
+    }
+
     protected virtual bool ShouldDisplayIcon()
     {
       return playerCtrl.InteractableObject.Contains((IInteractable)this);
