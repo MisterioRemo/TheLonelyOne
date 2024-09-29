@@ -120,12 +120,17 @@ namespace TheLonelyOne.Player
     protected void OnTriggerExit2D(Collider2D _collision)
     {
       if (interactableObject != null
-          && interactableObject.Contains(_collision.GetComponent<IInteractable>()))
+          && TryGetInteractableComponents(_collision.gameObject, out IInteractable[] interactable))
       {
-        interactableObjectsInArea.Remove(InteractableObject);
-        InteractableObject = null;
-        if (interactableObjectsInArea.Count != 0)
-          InteractableObject = interactableObjectsInArea.First();
+        if (interactableObjectsInArea.Contains(interactable))
+          interactableObjectsInArea.Remove(interactable);
+
+        if (interactableObject.SequenceEqual(interactable))
+        {
+          InteractableObject = null;
+          if (interactableObjectsInArea.Count != 0)
+            InteractableObject = interactableObjectsInArea.First();
+        }
       }
     }
     #endregion
