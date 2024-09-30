@@ -10,6 +10,7 @@ namespace TheLonelyOne
     [Inject] protected PlotManager          plotManager;
     [Inject] protected DialogueManager      dialogueManager;
     [Inject] protected LightColorController lightColorCtrl;
+    [Inject] protected AudioManager         audioManager;
 
     [Header("Intro")]
     [SerializeField] protected TextAsset inkIntro;
@@ -34,6 +35,8 @@ namespace TheLonelyOne
       // Intro
       if (!plotManager.IsPlotPointAchieved("NarrationIntroIsSeen"))
         dialogueManager.StartNarration(inkIntro);
+      else
+        audioManager.PlayMusic("MainHouseBG");
 
       // Strongbox
       isStrongboxReactionSeen = (bool)strongboxDialogueParticipant.GetInkVariableState("is_reaction_seen");

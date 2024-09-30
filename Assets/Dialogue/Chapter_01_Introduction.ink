@@ -12,4 +12,5 @@
 Вы вздохнули.
 Ханна скоро будет здесь, лучше встретить её снаружи.
 > CompletePlotPoint NarrationIntroIsSeen
+> PlayMusic MainHouseBG
 -> END

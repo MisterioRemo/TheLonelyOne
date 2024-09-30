@@ -265,6 +265,7 @@ Transform:
   - {fileID: 464592717434606861}
   - {fileID: 2754055854319636430}
   - {fileID: 6574603633643704295}
+  - {fileID: 1342449963428856498}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -289,6 +290,7 @@ MonoBehaviour:
   - {fileID: 3992956382590674033}
   - {fileID: 8939730764762140310}
   - {fileID: 6334650193187098379}
+  - {fileID: 862676361237269651}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -395,3 +397,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameLoader: {fileID: 1008767051930290710, guid: c0c3307b4662afc4a98ae506528ad097, type: 3}
+--- !u!1 &9042061757036063763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1342449963428856498}
+  - component: {fileID: 862676361237269651}
+  m_Layer: 0
+  m_Name: AudioInstaller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1342449963428856498
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9042061757036063763}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5279864626811398758}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &862676361237269651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9042061757036063763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36c1deeb0c829264e86a38fd63ae4bf0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioManagerPrefab: {fileID: 7081222836351609732, guid: 0d9ae75c8d8cdd54db8b1d2b99a3b6ea, type: 3}

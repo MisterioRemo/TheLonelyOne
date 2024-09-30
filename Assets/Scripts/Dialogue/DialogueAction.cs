@@ -13,6 +13,7 @@ namespace TheLonelyOne.Dialogue
       [Inject] protected UIObjectsManager uiManager;
       [Inject] protected PlotManager      plotManager;
       [Inject] protected GameLoader       gameLoader;
+      [Inject] protected AudioManager     audioManager;
 
       public DialogueAction(DialogueManager _dialogueManager)
       {
@@ -80,6 +81,16 @@ namespace TheLonelyOne.Dialogue
       public void LoadScene(string _sceneName)
       {
         gameLoader.LoadScene(_sceneName);
+      }
+
+      public void PlayMusic(string _name)
+      {
+        audioManager.PlayMusic(_name);
+      }
+
+      public void PlaySFX(string _name)
+      {
+        audioManager.PlaySFX(_name);
       }
     }
   }
